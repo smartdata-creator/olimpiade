@@ -564,41 +564,7 @@
                         <!-- Sport Selection Radios -->
                         <div class="space-y-3 pt-2">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Pilih Cabang Olahraga</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                
-                                <label class="sport-checkbox-label relative block cursor-pointer">
-                                    <input type="radio" name="sport_choice" value="Padel" class="peer sr-only" required>
-                                    <div class="p-4 rounded-2xl border border-slate-300 bg-white text-center transition-all peer-checked:border-olympic-blue peer-checked:bg-blue-50/80 peer-checked:shadow-md hover:bg-slate-100">
-                                        <i class="fa-solid fa-table-tennis-paddle-ball text-2xl text-olympic-blue mb-1 block"></i>
-                                        <span class="text-xs font-extrabold text-slate-800 block">Padel</span>
-                                    </div>
-                                </label>
-
-                                <label class="sport-checkbox-label relative block cursor-pointer">
-                                    <input type="radio" name="sport_choice" value="Futsal" class="peer sr-only">
-                                    <div class="p-4 rounded-2xl border border-slate-300 bg-white text-center transition-all peer-checked:border-olympic-red peer-checked:bg-red-50/80 peer-checked:shadow-md hover:bg-slate-100">
-                                        <i class="fa-solid fa-soccer-ball text-2xl text-olympic-red mb-1 block"></i>
-                                        <span class="text-xs font-extrabold text-slate-800 block">Futsal</span>
-                                    </div>
-                                </label>
-
-                                <label class="sport-checkbox-label relative block cursor-pointer">
-                                    <input type="radio" name="sport_choice" value="Mancing Mania" class="peer sr-only">
-                                    <div class="p-4 rounded-2xl border border-slate-300 bg-white text-center transition-all peer-checked:border-olympic-green peer-checked:bg-emerald-50/80 peer-checked:shadow-md hover:bg-slate-100">
-                                        <i class="fa-solid fa-fish-fins text-2xl text-olympic-green mb-1 block"></i>
-                                        <span class="text-xs font-extrabold text-slate-800 block">Mancing</span>
-                                    </div>
-                                </label>
-
-                                <label class="sport-checkbox-label relative block cursor-pointer">
-                                    <input type="radio" name="sport_choice" value="Basketball 3 on 3" class="peer sr-only">
-                                    <div class="p-4 rounded-2xl border border-slate-300 bg-white text-center transition-all peer-checked:border-olympic-purple peer-checked:bg-purple-50/80 peer-checked:shadow-md hover:bg-slate-100">
-                                        <i class="fa-solid fa-basketball text-2xl text-olympic-purple mb-1 block"></i>
-                                        <span class="text-xs font-extrabold text-slate-800 block">Basket 3v3</span>
-                                    </div>
-                                </label>
-
-                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="sport-choice-list"></div>
                         </div>
 
                         <!-- Fair Play Terms Agreement -->
@@ -788,6 +754,40 @@
         // ====== Render & Muat Agenda Lomba (cabang, tempat, jadwal) ======
         let allAgendaItems = [];
 
+        // Dipakai kalau Agenda Lomba masih kosong, supaya form pendaftaran tetap bisa dipakai.
+        const FALLBACK_SPORTS = [
+            { sport: "Padel", icon: "fa-table-tennis-paddle-ball", color: "blue" },
+            { sport: "Futsal", icon: "fa-soccer-ball", color: "red" },
+            { sport: "Mancing Mania", icon: "fa-fish-fins", color: "green" },
+            { sport: "Basketball 3 on 3", icon: "fa-basketball", color: "purple" }
+        ];
+
+        // ====== Pilihan Cabang Olahraga di Form Pendaftaran (ikut Agenda Lomba) ======
+        function renderSportChoices() {
+            const container = document.getElementById("sport-choice-list");
+            const previousValue = document.querySelector('input[name="sport_choice"]:checked')?.value;
+            const sports = allAgendaItems.length
+                ? allAgendaItems.map(a => ({ sport: a.sport, icon: a.icon, color: a.color }))
+                : FALLBACK_SPORTS;
+
+            container.innerHTML = sports.map((s, i) => {
+                const theme = getColorTheme(s.color);
+                return `
+                <label class="sport-checkbox-label relative block cursor-pointer">
+                    <input type="radio" name="sport_choice" value="${escapeHtml(s.sport)}" class="peer sr-only" ${i === 0 ? "required" : ""}>
+                    <div class="p-4 rounded-2xl border border-slate-300 bg-white text-center transition-all peer-checked:border-[${theme.swatch}] peer-checked:${theme.bg} peer-checked:shadow-md hover:bg-slate-100">
+                        ${renderIconHtml(s.icon, `text-2xl ${theme.text} mb-1 block`, "w-8 h-8 object-contain mx-auto mb-1")}
+                        <span class="text-xs font-extrabold text-slate-800 block">${escapeHtml(s.sport)}</span>
+                    </div>
+                </label>`;
+            }).join("");
+
+            if (previousValue) {
+                const restore = document.querySelector(`input[name="sport_choice"][value="${CSS.escape(previousValue)}"]`);
+                if (restore) restore.checked = true;
+            }
+        }
+
         function renderAgenda(items) {
             const container = document.getElementById("agenda-list");
             const empty = document.getElementById("agenda-empty");
@@ -850,6 +850,7 @@
             } finally {
                 loading.classList.add("hidden");
             }
+            renderSportChoices();
         }
 
         // ====== Jadwal Pertandingan (publik) ======
