@@ -58,6 +58,24 @@
         .olympic-ring-shadow {
             box-shadow: 0 10px 25px -5px rgba(0, 102, 255, 0.12), 0 8px 10px -6px rgba(255, 42, 85, 0.12);
         }
+        @keyframes marquee-scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee-scroll 32s linear infinite;
+        }
+        .animate-marquee-reverse {
+            animation: marquee-scroll 32s linear infinite reverse;
+        }
+        .marquee-track {
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+        }
+        .marquee-track:hover .animate-marquee,
+        .marquee-track:hover .animate-marquee-reverse {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-olympic-blue selection:text-white">
@@ -230,6 +248,30 @@
                     </div>
 
                 </div>
+            </div>
+        </section>
+
+        <section id="mitra" class="py-12 bg-white border-b border-slate-200 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <div id="mitra-loading" class="text-center py-4">
+                    <i class="fa-solid fa-spinner fa-spin text-xl text-slate-300"></i>
+                </div>
+
+                <div id="hotel-marquee-wrap" class="hidden mb-10">
+                    <p class="text-center text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Unit Hotel Peserta</p>
+                    <div class="marquee-track overflow-hidden">
+                        <div id="hotel-marquee-track" class="flex items-center gap-14 w-max animate-marquee"></div>
+                    </div>
+                </div>
+
+                <div id="sponsor-marquee-wrap" class="hidden">
+                    <p class="text-center text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Didukung Oleh</p>
+                    <div class="marquee-track overflow-hidden">
+                        <div id="sponsor-marquee-track" class="flex items-center gap-14 w-max animate-marquee-reverse"></div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -675,7 +717,7 @@
 
             <div class="border-t border-slate-200 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-xs text-slate-500 font-medium">
-                    &copy; 2026 KAGUM Hotels Group. All rights reserved. Bright Olympic Theme.
+                    &copy; 2026 KAGUM Hotels Group. All rights reserved. Bright Olympic Theme. Sponsored by PT Accuransi Teknologi Indonesia
                 </p>
                 <div class="flex gap-4 text-slate-400 text-base">
                     <a href="#" class="hover:text-olympic-blue transition-colors"><i class="fa-brands fa-instagram"></i></a>
@@ -766,7 +808,7 @@
                 <div class="bg-slate-50 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-2 border border-slate-200 hover:${theme.border} hover:shadow-xl flex flex-col justify-between group">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr ${theme.ring} flex items-center justify-center text-white mb-6 shadow-md group-hover:scale-110 transition-transform">
-                            <i class="fa-solid ${item.icon} text-2xl"></i>
+                            ${renderIconHtml(item.icon, "text-2xl")}
                         </div>
                         <h3 class="font-title font-extrabold text-xl text-slate-900 mb-2">${escapeHtml(item.sport)}</h3>
                         <p class="text-xs text-slate-600 leading-relaxed mb-4">${escapeHtml(item.description || "")}</p>
@@ -853,7 +895,7 @@
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-all">
                     <div class="flex items-center justify-between mb-3 gap-2">
                         <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${meta.bg} ${meta.text} border ${meta.border} inline-flex items-center gap-1.5">
-                            <i class="fa-solid ${meta.icon}"></i> ${escapeHtml(m.sport)}
+                            ${renderIconHtml(meta.icon, "", "w-3.5 h-3.5 object-contain")} ${escapeHtml(m.sport)}
                         </span>
                         <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${hasScore ? "bg-emerald-50 text-olympic-green border border-emerald-200" : "bg-slate-100 text-slate-500 border border-slate-200"}">
                             ${hasScore ? "Selesai" : "Belum Dimulai"}
@@ -887,6 +929,44 @@
             }
             renderMatchTabs();
             renderMatchList();
+        }
+
+        // ====== Logo Hotel & Sponsor (marquee) ======
+        function renderLogoTrack(trackId, wrapId, logos) {
+            const wrap = document.getElementById(wrapId);
+            const track = document.getElementById(trackId);
+
+            if (!logos.length) {
+                wrap.classList.add("hidden");
+                track.innerHTML = "";
+                return;
+            }
+            wrap.classList.remove("hidden");
+
+            const renderItem = (logo) => {
+                const src = getImageDirectUrl(logo.image_url);
+                const img = `<img src="${src}" alt="${escapeHtml(logo.name)}" class="h-full w-auto object-contain" loading="lazy">`;
+                const inner = `<div class="shrink-0 h-12 sm:h-14 flex items-center justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all">${img}</div>`;
+                return logo.link
+                    ? `<a href="${logo.link}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(logo.name)}">${inner}</a>`
+                    : `<div title="${escapeHtml(logo.name)}">${inner}</div>`;
+            };
+
+            // Digandakan 2x supaya animasi geser -50% terlihat menyambung tanpa putus (loop mulus).
+            track.innerHTML = logos.map(renderItem).join("") + logos.map(renderItem).join("");
+        }
+
+        async function loadMitra() {
+            const loading = document.getElementById("mitra-loading");
+            try {
+                const logos = await fetchLogos();
+                renderLogoTrack("hotel-marquee-track", "hotel-marquee-wrap", logos.filter(l => l.type === "hotel"));
+                renderLogoTrack("sponsor-marquee-track", "sponsor-marquee-wrap", logos.filter(l => l.type === "sponsor"));
+            } catch (err) {
+                console.error("Gagal memuat logo hotel & sponsor:", err);
+            } finally {
+                loading.classList.add("hidden");
+            }
         }
 
         // ====== Video Sejarah / History ======
@@ -1029,7 +1109,7 @@
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-11 h-11 rounded-xl bg-gradient-to-tr ${meta.ring} flex items-center justify-center text-white shrink-0">
-                            <i class="fa-solid ${meta.icon}"></i>
+                            ${renderIconHtml(meta.icon)}
                         </div>
                         <div class="min-w-0">
                             <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(p.name)}</p>
@@ -1169,6 +1249,7 @@
             loadEventInfo();
             populateHotelSelect();
             loadSejarah();
+            loadMitra();
             await loadAgenda();
             await loadPertandingan();
             loadKlasemen();

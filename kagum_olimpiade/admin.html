@@ -164,15 +164,15 @@
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Ikon (FontAwesome)</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Ikon</label>
                             <div class="flex items-center gap-3">
-                                <input type="text" id="f-icon" placeholder="fa-table-tennis-paddle-ball" oninput="updateIconPreview()"
+                                <input type="text" id="f-icon" placeholder="fa-table-tennis-paddle-ball atau https://...png" oninput="updateIconPreview()"
                                     class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
-                                <div class="w-11 h-11 shrink-0 rounded-xl bg-slate-800 flex items-center justify-center text-white">
-                                    <i id="icon-preview" class="fa-solid fa-trophy"></i>
+                                <div id="icon-preview" class="w-11 h-11 shrink-0 rounded-xl bg-slate-800 flex items-center justify-center text-white">
+                                    <i class="fa-solid fa-trophy"></i>
                                 </div>
                             </div>
-                            <p class="text-[11px] text-slate-400">Cari nama ikon di <span class="font-semibold">fontawesome.com/icons</span>, contoh: fa-soccer-ball, fa-basketball, fa-fish-fins.</p>
+                            <p class="text-[11px] text-slate-400">Isi nama ikon <span class="font-semibold">FontAwesome</span> (cari di fontawesome.com/icons, contoh: fa-soccer-ball) <strong>atau</strong> tempel link gambar langsung (contoh: https://cdn-icons-png.flaticon.com/128/xxxx/xxxx.png).</p>
                         </div>
                         <div class="space-y-1.5">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Warna Tema</label>
@@ -486,6 +486,85 @@
             <!-- List -->
             <div id="video-admin-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
+            <!-- ====== Kelola Logo Hotel & Sponsor ====== -->
+            <div class="flex items-center justify-between mt-12 mb-4">
+                <h2 class="font-title font-extrabold text-lg text-slate-900">
+                    Logo Hotel &amp; Sponsor <span id="logo-admin-count" class="text-slate-400 font-medium text-sm">(0)</span>
+                </h2>
+                <button onclick="openLogoForm()" class="px-5 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Tambah Logo
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+                Muncul sebagai baris logo yang bergeser otomatis di beranda, tepat di bawah hero. Tempel link gambar (PNG/JPG dengan background transparan lebih rapi) dari Google Drive (satu file, share ke "Anyone with the link") atau URL gambar langsung.
+            </p>
+
+            <!-- Logo Form Panel (add/edit) -->
+            <div id="logo-form-panel" class="hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 id="logo-form-title" class="font-title font-extrabold text-lg text-slate-900">Tambah Logo</h3>
+                    <button onclick="closeLogoForm()" class="text-slate-400 hover:text-slate-700 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form id="logo-form" onsubmit="submitLogoForm(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Nama</label>
+                            <input type="text" id="lg-name" required placeholder="Contoh: Golden Flower Hotel Bandung"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Jenis</label>
+                            <select id="lg-type" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 cursor-pointer">
+                                <option value="hotel">Unit Hotel</option>
+                                <option value="sponsor">Sponsor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Link Gambar Logo</label>
+                        <input type="url" id="lg-image" required placeholder="https://drive.google.com/file/d/xxxxxxxx/view?usp=sharing" oninput="updateLogoPreview()"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Link Website (opsional)</label>
+                        <input type="url" id="lg-link" placeholder="https://..."
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                    </div>
+
+                    <!-- Live Preview -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Preview</label>
+                        <div id="logo-preview-box" class="h-20 w-40 bg-slate-100 rounded-xl border border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
+                            <span class="text-slate-400 text-[11px] font-medium px-2 text-center">Tempel link gambar untuk lihat preview</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" id="logo-submit-btn" class="px-6 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan
+                        </button>
+                        <button type="button" onclick="closeLogoForm()" class="px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading -->
+            <div id="logo-admin-loading" class="text-center py-14">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Memuat daftar logo...</p>
+            </div>
+
+            <!-- Empty -->
+            <div id="logo-admin-empty" class="hidden text-center py-14 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="fa-solid fa-image text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada logo. Klik "Tambah Logo" untuk mulai.</p>
+            </div>
+
+            <!-- List -->
+            <div id="logo-admin-list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+
         </div>
     </main>
 
@@ -574,8 +653,8 @@
         }
 
         function updateIconPreview() {
-            const val = document.getElementById("f-icon").value.trim() || "fa-trophy";
-            document.getElementById("icon-preview").className = `fa-solid ${val}`;
+            const val = document.getElementById("f-icon").value.trim();
+            document.getElementById("icon-preview").innerHTML = renderIconHtml(val, "text-lg");
         }
 
         // ====== Notifikasi ======
@@ -680,7 +759,7 @@
                 return `
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${theme.ring} flex items-center justify-center text-white shrink-0">
-                        <i class="fa-solid ${item.icon}"></i>
+                        ${renderIconHtml(item.icon)}
                     </div>
                     <div class="flex-grow min-w-0">
                         <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(item.sport)}</p>
@@ -1000,7 +1079,7 @@
                 return `
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-4">
                     <div class="w-11 h-11 rounded-xl bg-gradient-to-tr ${meta.ring} flex items-center justify-center text-white shrink-0">
-                        <i class="fa-solid ${meta.icon}"></i>
+                        ${renderIconHtml(meta.icon)}
                     </div>
                     <div class="flex-grow min-w-0">
                         <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(m.team_a)} <span class="text-slate-400 font-normal">vs</span> ${escapeHtml(m.team_b)}</p>
@@ -1347,6 +1426,141 @@
             }
         }
 
+        // ====== Kelola Logo Hotel & Sponsor ======
+        let logosAdmin = [];
+        let editingLogoId = null;
+
+        function updateLogoPreview() {
+            const url = document.getElementById("lg-image").value.trim();
+            const box = document.getElementById("logo-preview-box");
+            if (!url) {
+                box.innerHTML = '<span class="text-slate-400 text-[11px] font-medium px-2 text-center">Tempel link gambar untuk lihat preview</span>';
+                return;
+            }
+            const src = getImageDirectUrl(url);
+            box.innerHTML = `<img src="${src}" alt="preview" class="max-h-full max-w-full object-contain" onerror="this.parentElement.innerHTML='<span class=&quot;text-red-500 text-[11px] font-semibold px-2 text-center&quot;>Gagal memuat gambar — cek link-nya</span>'">`;
+        }
+
+        function openLogoForm(logo = null) {
+            editingLogoId = logo ? logo.id : null;
+            document.getElementById("logo-form-title").textContent = logo ? "Edit Logo" : "Tambah Logo";
+            document.getElementById("lg-name").value = logo?.name || "";
+            document.getElementById("lg-type").value = logo?.type || "hotel";
+            document.getElementById("lg-image").value = logo?.image_url || "";
+            document.getElementById("lg-link").value = logo?.link || "";
+            updateLogoPreview();
+            document.getElementById("logo-form-panel").classList.remove("hidden");
+            document.getElementById("logo-form-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function closeLogoForm() {
+            document.getElementById("logo-form-panel").classList.add("hidden");
+            document.getElementById("logo-form").reset();
+            updateLogoPreview();
+            editingLogoId = null;
+        }
+
+        async function submitLogoForm(event) {
+            event.preventDefault();
+            const payload = {
+                action: editingLogoId ? "logo_update" : "logo_create",
+                id: editingLogoId,
+                name: document.getElementById("lg-name").value.trim(),
+                type: document.getElementById("lg-type").value,
+                image_url: document.getElementById("lg-image").value.trim(),
+                link: document.getElementById("lg-link").value.trim()
+            };
+
+            const btn = document.getElementById("logo-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+            try {
+                await postLogoChange(payload);
+                showMessage(editingLogoId ? "Logo berhasil diperbarui." : "Logo baru berhasil ditambahkan.", "success");
+                closeLogoForm();
+                await loadLogosAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menyimpan: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteLogoItem(logo) {
+            if (!confirm(`Hapus logo "${logo.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+            try {
+                await postLogoChange({ action: "logo_delete", id: logo.id });
+                showMessage(`Logo "${logo.name}" berhasil dihapus.`, "success");
+                await loadLogosAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menghapus: " + err.message, "error");
+                }
+            }
+        }
+
+        function renderLogosAdmin() {
+            const container = document.getElementById("logo-admin-list");
+            const empty = document.getElementById("logo-admin-empty");
+            document.getElementById("logo-admin-count").textContent = `(${logosAdmin.length})`;
+
+            if (!logosAdmin.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = logosAdmin.map((lg, i) => `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="h-20 bg-slate-50 flex items-center justify-center p-3">
+                        <img src="${getImageDirectUrl(lg.image_url)}" alt="${escapeHtml(lg.name)}" class="max-h-full max-w-full object-contain" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="p-3">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <p class="text-xs font-bold text-slate-900 truncate">${escapeHtml(lg.name)}</p>
+                            <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${lg.type === "sponsor" ? "bg-purple-50 text-olympic-purple" : "bg-blue-50 text-olympic-blue"}">${lg.type === "sponsor" ? "Sponsor" : "Hotel"}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button data-idx="${i}" class="btn-edit-logo flex-1 px-2 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i> Edit
+                            </button>
+                            <button data-idx="${i}" class="btn-delete-logo px-2 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-olympic-red text-[11px] font-bold transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`
+            ).join("");
+
+            container.querySelectorAll(".btn-edit-logo").forEach(btn => {
+                btn.addEventListener("click", () => openLogoForm(logosAdmin[parseInt(btn.dataset.idx, 10)]));
+            });
+            container.querySelectorAll(".btn-delete-logo").forEach(btn => {
+                btn.addEventListener("click", () => deleteLogoItem(logosAdmin[parseInt(btn.dataset.idx, 10)]));
+            });
+        }
+
+        async function loadLogosAdmin() {
+            try {
+                logosAdmin = await fetchLogos();
+                renderLogosAdmin();
+            } catch (err) {
+                showMessage("Gagal memuat daftar logo: " + err.message, "error");
+            } finally {
+                document.getElementById("logo-admin-loading").classList.add("hidden");
+            }
+        }
+
         async function initAdminContent() {
             renderColorPicker();
             setSelectedColor("blue");
@@ -1354,6 +1568,7 @@
             loadParticipantsAdmin();
             loadHotelsAdmin();
             loadVideosAdmin();
+            loadLogosAdmin();
 
             await loadAgendaAdmin();
             await populateMatchFormOptions();

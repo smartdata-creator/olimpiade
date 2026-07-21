@@ -132,6 +132,20 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
+// Ikon cabang olahraga / agenda bisa diisi nama ikon FontAwesome (mis. "fa-basketball")
+// ATAU link gambar langsung (mis. "https://.../icon.png") — dua-duanya didukung.
+function isImageIconUrl(icon) {
+    return /^https?:\/\//i.test(String(icon || "").trim());
+}
+
+function renderIconHtml(icon, fontSizeClass, imgClass) {
+    const value = String(icon || "").trim();
+    if (isImageIconUrl(value)) {
+        return `<img src="${escapeHtml(value)}" alt="" class="${imgClass || "w-2/3 h-2/3 object-contain"}">`;
+    }
+    return `<i class="fa-solid ${value || "fa-trophy"} ${fontSizeClass || ""}"></i>`;
+}
+
 // Ambil seluruh data peserta dari Google Sheets, terbaru lebih dulu
 async function fetchParticipants() {
     if (!CONFIG.GOOGLE_SCRIPT_URL) {
@@ -395,6 +409,59 @@ async function postVideoChange(payload) {
     const result = await res.json();
     if (!result || result.result !== "success") {
         const message = (result && result.message) || "Gagal menyimpan data video.";
+        if (/token/i.test(message)) {
+            localStorage.removeItem("kagum_admin_token");
+        }
+        throw new Error(message);
+    }
+    return result;
+}
+
+// ====== Logo Hotel & Sponsor ======
+
+// Ubah link gambar Google Drive biasa menjadi link gambar langsung yang bisa dipakai di <img src>.
+// URL non-Drive (imgur, dsb) dianggap sudah siap pakai dan dikembalikan apa adanya.
+function getImageDirectUrl(url) {
+    if (!url) return null;
+    const trimmed = String(url).trim();
+
+    let m = trimmed.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`;
+
+    m = trimmed.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`;
+
+    return trimmed;
+}
+
+// Ambil seluruh logo hotel & sponsor dari sheet "Logo"
+async function fetchLogos() {
+    if (!CONFIG.GOOGLE_SCRIPT_URL) {
+        console.warn("CONFIG.GOOGLE_SCRIPT_URL belum diisi — logo tidak bisa dimuat.");
+        return [];
+    }
+    const res = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?sheet=logo`, { method: "GET" });
+    const data = await res.json();
+    return data.map(row => ({
+        id: row.id,
+        name: row.name,
+        type: row.type || "hotel",
+        image_url: row.image_url,
+        link: row.link
+    }));
+}
+
+// Kirim perubahan data logo (tambah/ubah/hapus) — hanya untuk halaman admin.
+async function postLogoChange(payload) {
+    const token = localStorage.getItem("kagum_admin_token") || "";
+    const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ ...payload, token })
+    });
+    const result = await res.json();
+    if (!result || result.result !== "success") {
+        const message = (result && result.message) || "Gagal menyimpan data logo.";
         if (/token/i.test(message)) {
             localStorage.removeItem("kagum_admin_token");
         }
