@@ -68,6 +68,19 @@ const sportMeta = {
     "Basketball 3 on 3": { icon: "fa-basketball", text: "text-olympic-purple", bg: "bg-purple-50", border: "border-purple-200", ring: "from-purple-600 to-indigo-500" }
 };
 
+// Cari ikon & warna untuk sebuah cabang olahraga: utamakan data dari Agenda Lomba
+// (karena admin bisa tambah cabang baru bebas di luar 4 cabang resmi), lalu sportMeta,
+// lalu default netral kalau sama sekali belum terdaftar di mana pun.
+function getSportVisual(sport, agendaList) {
+    const fromAgenda = (agendaList || []).find(a => a.sport === sport);
+    if (fromAgenda) {
+        const theme = getColorTheme(fromAgenda.color);
+        return { icon: fromAgenda.icon || "fa-trophy", text: theme.text, bg: theme.bg, border: theme.border, ring: theme.ring };
+    }
+    if (sportMeta[sport]) return sportMeta[sport];
+    return { icon: "fa-trophy", text: "text-slate-600", bg: "bg-slate-100", border: "border-slate-200", ring: "from-slate-500 to-slate-400" };
+}
+
 // Palet warna tema untuk kartu Agenda Lomba (dipilih bebas oleh admin per cabang)
 const COLOR_THEMES = {
     blue: { label: "Biru", text: "text-olympic-blue", bg: "bg-blue-50", border: "border-blue-200", ring: "from-blue-500 to-cyan-400", solid: "bg-olympic-blue", swatch: "#0066FF" },
@@ -314,6 +327,74 @@ async function postMatchChange(payload) {
     const result = await res.json();
     if (!result || result.result !== "success") {
         const message = (result && result.message) || "Gagal menyimpan data pertandingan.";
+        if (/token/i.test(message)) {
+            localStorage.removeItem("kagum_admin_token");
+        }
+        throw new Error(message);
+    }
+    return result;
+}
+
+// ====== Video Sejarah / History ======
+
+// Ubah link Google Drive atau YouTube biasa menjadi link "embed" yang bisa diputar di <iframe>.
+// Return null kalau formatnya tidak dikenali (pemanggil bisa tampilkan tombol "Buka Video" biasa).
+function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    const trimmed = String(url).trim();
+
+    // Sudah berupa link embed/preview
+    if (/\/embed\//.test(trimmed) || /\/preview(\?|$)/.test(trimmed)) return trimmed;
+
+    // Google Drive: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+    let m = trimmed.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+
+    // Google Drive: https://drive.google.com/open?id=FILE_ID
+    m = trimmed.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+
+    // YouTube: https://youtu.be/VIDEO_ID
+    m = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+
+    // YouTube: https://www.youtube.com/watch?v=VIDEO_ID
+    m = trimmed.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+
+    return null;
+}
+
+// Ambil seluruh video sejarah/momen berkesan dari sheet "Video", terbaru (tahun) lebih dulu
+async function fetchVideos() {
+    if (!CONFIG.GOOGLE_SCRIPT_URL) {
+        console.warn("CONFIG.GOOGLE_SCRIPT_URL belum diisi — video tidak bisa dimuat.");
+        return [];
+    }
+    const res = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?sheet=video`, { method: "GET" });
+    const data = await res.json();
+    return data
+        .map(row => ({
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            year: row.year,
+            video_url: row.video_url
+        }))
+        .sort((a, b) => String(b.year || "").localeCompare(String(a.year || "")));
+}
+
+// Kirim perubahan data video (tambah/ubah/hapus) — hanya untuk halaman admin.
+async function postVideoChange(payload) {
+    const token = localStorage.getItem("kagum_admin_token") || "";
+    const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ ...payload, token })
+    });
+    const result = await res.json();
+    if (!result || result.result !== "success") {
+        const message = (result && result.message) || "Gagal menyimpan data video.";
         if (/token/i.test(message)) {
             localStorage.removeItem("kagum_admin_token");
         }

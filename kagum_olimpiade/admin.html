@@ -407,6 +407,85 @@
             <!-- List -->
             <div id="hotel-admin-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
 
+            <!-- ====== Video Sejarah / History ====== -->
+            <div class="flex items-center justify-between mt-12 mb-4">
+                <h2 class="font-title font-extrabold text-lg text-slate-900">
+                    Video Sejarah <span id="video-admin-count" class="text-slate-400 font-medium text-sm">(0)</span>
+                </h2>
+                <button onclick="openVideoForm()" class="px-5 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Tambah Video
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+                Tempel link Google Drive <strong>ke satu file video</strong> (bukan link folder) — klik kanan file di Drive → Share → ubah akses jadi "Anyone with the link" → Copy link. Format link YouTube juga didukung.
+            </p>
+
+            <!-- Video Form Panel (add/edit) -->
+            <div id="video-form-panel" class="hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 id="video-form-title" class="font-title font-extrabold text-lg text-slate-900">Tambah Video</h3>
+                    <button onclick="closeVideoForm()" class="text-slate-400 hover:text-slate-700 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form id="video-form" onsubmit="submitVideoForm(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="space-y-1.5 md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Judul Video</label>
+                            <input type="text" id="v-title" required placeholder="Contoh: Keseruan Final Futsal 2025"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tahun</label>
+                            <input type="text" id="v-year" placeholder="Contoh: 2025"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Link Video (Google Drive atau YouTube)</label>
+                        <input type="url" id="v-url" required placeholder="https://drive.google.com/file/d/xxxxxxxx/view?usp=sharing" oninput="updateVideoPreview()"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Deskripsi Singkat</label>
+                        <textarea id="v-description" rows="2" placeholder="Deskripsi singkat video ini..."
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20"></textarea>
+                    </div>
+
+                    <!-- Live Preview -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Preview</label>
+                        <div id="video-preview-empty" class="aspect-video w-full max-w-sm bg-slate-100 rounded-xl border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-xs font-medium">
+                            Tempel link video untuk lihat preview
+                        </div>
+                        <div id="video-preview-frame" class="hidden aspect-video w-full max-w-sm bg-slate-900 rounded-xl overflow-hidden"></div>
+                        <p id="video-preview-error" class="hidden text-[11px] text-red-600 font-semibold mt-1.5">Link tidak dikenali — pastikan ini link Google Drive ke satu file, atau link YouTube.</p>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" id="video-submit-btn" class="px-6 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan
+                        </button>
+                        <button type="button" onclick="closeVideoForm()" class="px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading -->
+            <div id="video-admin-loading" class="text-center py-14">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Memuat daftar video...</p>
+            </div>
+
+            <!-- Empty -->
+            <div id="video-admin-empty" class="hidden text-center py-14 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="fa-solid fa-clapperboard text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada video. Klik "Tambah Video" untuk mulai.</p>
+            </div>
+
+            <!-- List -->
+            <div id="video-admin-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
         </div>
     </main>
 
@@ -555,6 +634,7 @@
                 showMessage(editingId ? "Agenda berhasil diperbarui." : "Agenda baru berhasil ditambahkan.", "success");
                 closeForm();
                 await loadAgendaAdmin();
+                await refreshSportOptions();
             } catch (err) {
                 if (/token/i.test(err.message)) {
                     rejectStoredToken(err.message);
@@ -573,6 +653,7 @@
                 await postAgendaChange({ action: "agenda_delete", id });
                 showMessage(`Agenda "${sportName}" berhasil dihapus.`, "success");
                 await loadAgendaAdmin();
+                await refreshSportOptions();
             } catch (err) {
                 if (/token/i.test(err.message)) {
                     rejectStoredToken(err.message);
@@ -771,15 +852,37 @@
             });
         }
 
-        async function populateMatchFormOptions() {
-            const sportSelect = document.getElementById("m-sport");
-            Object.keys(sportMeta).forEach(sport => {
-                const opt = document.createElement("option");
-                opt.value = sport;
-                opt.textContent = sport;
-                sportSelect.appendChild(opt);
-            });
+        // Ambil nama-nama cabang olahraga dari Agenda Lomba (sudah termasuk cabang baru yang
+        // ditambah admin). Fallback ke 4 cabang resmi kalau Agenda masih kosong.
+        async function getAvailableSports() {
+            try {
+                const agenda = await fetchAgenda();
+                const names = [...new Set(agenda.map(a => a.sport).filter(Boolean))];
+                return names.length ? names : Object.keys(sportMeta);
+            } catch (err) {
+                console.error("Gagal memuat daftar cabang olahraga:", err);
+                return Object.keys(sportMeta);
+            }
+        }
 
+        async function refreshSportOptions() {
+            const sports = await getAvailableSports();
+
+            const sportSelect = document.getElementById("m-sport");
+            const currentSportValue = sportSelect.value;
+            sportSelect.innerHTML = '<option value="" disabled selected>Pilih Cabang</option>' +
+                sports.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+            if (currentSportValue && sports.includes(currentSportValue)) sportSelect.value = currentSportValue;
+
+            const filterSelect = document.getElementById("match-filter-sport");
+            const currentFilterValue = filterSelect.value;
+            filterSelect.innerHTML = '<option value="">Semua Cabang</option>' +
+                sports.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+            filterSelect.value = currentFilterValue;
+        }
+
+        async function populateMatchFormOptions() {
+            await refreshSportOptions();
             await refreshTeamDropdowns();
 
             const typeSelect = document.getElementById("m-match-type");
@@ -788,14 +891,6 @@
                 opt.value = value;
                 opt.textContent = label;
                 typeSelect.appendChild(opt);
-            });
-
-            const filterSelect = document.getElementById("match-filter-sport");
-            Object.keys(sportMeta).forEach(sport => {
-                const opt = document.createElement("option");
-                opt.value = sport;
-                opt.textContent = sport;
-                filterSelect.appendChild(opt);
             });
         }
 
@@ -898,7 +993,7 @@
             empty.classList.add("hidden");
 
             container.innerHTML = list.map(m => {
-                const meta = sportMeta[m.sport] || sportMeta["Padel"];
+                const meta = getSportVisual(m.sport, agendaItems);
                 const hasScore = m.score_a !== null && m.score_b !== null && !isNaN(m.score_a) && !isNaN(m.score_b);
                 const scoreText = hasScore ? `${m.score_a} - ${m.score_b}` : "Belum ada skor";
                 const typeLabel = MATCH_TYPES[m.match_type] || MATCH_TYPES[""];
@@ -1089,15 +1184,180 @@
             }
         }
 
-        function initAdminContent() {
+        // ====== Video Sejarah / History ======
+        let videosAdmin = [];
+        let editingVideoId = null;
+
+        function updateVideoPreview() {
+            const url = document.getElementById("v-url").value.trim();
+            const empty = document.getElementById("video-preview-empty");
+            const frame = document.getElementById("video-preview-frame");
+            const error = document.getElementById("video-preview-error");
+
+            if (!url) {
+                empty.classList.remove("hidden");
+                frame.classList.add("hidden");
+                frame.innerHTML = "";
+                error.classList.add("hidden");
+                return;
+            }
+
+            const embedUrl = getVideoEmbedUrl(url);
+            if (!embedUrl) {
+                empty.classList.add("hidden");
+                frame.classList.add("hidden");
+                frame.innerHTML = "";
+                error.classList.remove("hidden");
+                return;
+            }
+
+            error.classList.add("hidden");
+            empty.classList.add("hidden");
+            frame.classList.remove("hidden");
+            frame.innerHTML = `<iframe src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+        }
+
+        function openVideoForm(video = null) {
+            editingVideoId = video ? video.id : null;
+            document.getElementById("video-form-title").textContent = video ? "Edit Video" : "Tambah Video";
+            document.getElementById("v-title").value = video?.title || "";
+            document.getElementById("v-year").value = video?.year || "";
+            document.getElementById("v-url").value = video?.video_url || "";
+            document.getElementById("v-description").value = video?.description || "";
+            updateVideoPreview();
+            document.getElementById("video-form-panel").classList.remove("hidden");
+            document.getElementById("video-form-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function closeVideoForm() {
+            document.getElementById("video-form-panel").classList.add("hidden");
+            document.getElementById("video-form").reset();
+            updateVideoPreview();
+            editingVideoId = null;
+        }
+
+        async function submitVideoForm(event) {
+            event.preventDefault();
+
+            const url = document.getElementById("v-url").value.trim();
+            if (!getVideoEmbedUrl(url)) {
+                showMessage("Link video tidak dikenali. Pastikan ini link Google Drive ke satu file (bukan folder) atau link YouTube.", "error");
+                return;
+            }
+
+            const payload = {
+                action: editingVideoId ? "video_update" : "video_create",
+                id: editingVideoId,
+                title: document.getElementById("v-title").value.trim(),
+                year: document.getElementById("v-year").value.trim(),
+                video_url: url,
+                description: document.getElementById("v-description").value.trim()
+            };
+
+            const btn = document.getElementById("video-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+            try {
+                await postVideoChange(payload);
+                showMessage(editingVideoId ? "Video berhasil diperbarui." : "Video baru berhasil ditambahkan.", "success");
+                closeVideoForm();
+                await loadVideosAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menyimpan: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteVideoItem(video) {
+            if (!confirm(`Hapus video "${video.title}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+            try {
+                await postVideoChange({ action: "video_delete", id: video.id });
+                showMessage(`Video "${video.title}" berhasil dihapus.`, "success");
+                await loadVideosAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menghapus: " + err.message, "error");
+                }
+            }
+        }
+
+        function renderVideosAdmin() {
+            const container = document.getElementById("video-admin-list");
+            const empty = document.getElementById("video-admin-empty");
+            document.getElementById("video-admin-count").textContent = `(${videosAdmin.length})`;
+
+            if (!videosAdmin.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = videosAdmin.map((v, i) => {
+                const embedUrl = getVideoEmbedUrl(v.video_url);
+                const thumb = embedUrl
+                    ? `<iframe src="${embedUrl}" class="w-full h-full" loading="lazy"></iframe>`
+                    : `<div class="w-full h-full flex items-center justify-center text-slate-400"><i class="fa-solid fa-triangle-exclamation text-2xl"></i></div>`;
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="aspect-video w-full bg-slate-900">${thumb}</div>
+                    <div class="p-4">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(v.title)}</p>
+                            ${v.year ? `<span class="shrink-0 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">${escapeHtml(String(v.year))}</span>` : ""}
+                        </div>
+                        <div class="flex items-center gap-2 mt-3">
+                            <button data-idx="${i}" class="btn-edit-video flex-1 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i> Edit
+                            </button>
+                            <button data-idx="${i}" class="btn-delete-video px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-olympic-red text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join("");
+
+            container.querySelectorAll(".btn-edit-video").forEach(btn => {
+                btn.addEventListener("click", () => openVideoForm(videosAdmin[parseInt(btn.dataset.idx, 10)]));
+            });
+            container.querySelectorAll(".btn-delete-video").forEach(btn => {
+                btn.addEventListener("click", () => deleteVideoItem(videosAdmin[parseInt(btn.dataset.idx, 10)]));
+            });
+        }
+
+        async function loadVideosAdmin() {
+            try {
+                videosAdmin = await fetchVideos();
+                renderVideosAdmin();
+            } catch (err) {
+                showMessage("Gagal memuat daftar video: " + err.message, "error");
+            } finally {
+                document.getElementById("video-admin-loading").classList.add("hidden");
+            }
+        }
+
+        async function initAdminContent() {
             renderColorPicker();
             setSelectedColor("blue");
-            populateMatchFormOptions();
             loadSettingsAdmin();
-            loadAgendaAdmin();
-            loadMatchesAdmin();
             loadParticipantsAdmin();
             loadHotelsAdmin();
+            loadVideosAdmin();
+
+            await loadAgendaAdmin();
+            await populateMatchFormOptions();
+            await loadMatchesAdmin();
         }
 
         // ====== Bootstrap: cek token tersimpan, kalau tidak ada/ tidak valid, tampilkan gerbang ======

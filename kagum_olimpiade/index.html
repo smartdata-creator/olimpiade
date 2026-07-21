@@ -81,6 +81,7 @@
                 <a href="#agenda" class="hover:text-olympic-blue transition-colors">Agenda Lomba</a>
                 <a href="#pertandingan" class="hover:text-olympic-blue transition-colors">Pertandingan</a>
                 <a href="#klasemen" class="hover:text-olympic-blue transition-colors">Klasemen</a>
+                <a href="#sejarah" class="hover:text-olympic-blue transition-colors">Sejarah</a>
                 <a href="peserta.html" class="hover:text-olympic-blue transition-colors">Peserta Terdaftar</a>
             </nav>
 
@@ -102,6 +103,7 @@
             <a href="#agenda" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Agenda Lomba</a>
             <a href="#pertandingan" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Pertandingan</a>
             <a href="#klasemen" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Klasemen</a>
+            <a href="#sejarah" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Sejarah</a>
             <a href="peserta.html" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Peserta Terdaftar</a>
             <div class="pt-2">
                 <a href="#registrasi" class="block w-full text-center py-3 bg-gradient-to-r from-olympic-blue to-olympic-red text-white font-bold rounded-xl shadow-md">
@@ -389,6 +391,36 @@
             </div>
         </section>
 
+        <section id="sejarah" class="py-20 bg-white relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <span class="text-xs font-black uppercase tracking-widest text-olympic-orange bg-orange-50 px-3 py-1 rounded-full border border-orange-200">Kenangan</span>
+                    <h2 class="font-title font-black text-3xl sm:text-4xl text-slate-900 mt-3">
+                        Momen <span class="text-gradient-olympic">Bersejarah</span>
+                    </h2>
+                    <p class="text-slate-600 mt-2 text-sm sm:text-base">
+                        Kilas balik keseruan KAGUM Olimpiade dari tahun ke tahun.
+                    </p>
+                </div>
+
+                <!-- Loading -->
+                <div id="sejarah-loading" class="text-center py-10">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                    <p class="text-slate-500 text-sm font-medium">Memuat video...</p>
+                </div>
+
+                <!-- Empty -->
+                <div id="sejarah-empty" class="hidden text-center py-10">
+                    <i class="fa-solid fa-video-slash text-4xl text-slate-400 mb-3 block"></i>
+                    <p class="text-slate-500 text-sm font-medium">Belum ada video sejarah yang ditambahkan.</p>
+                </div>
+
+                <!-- Dynamic Grid Container -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="sejarah-list"></div>
+            </div>
+        </section>
+
         <section id="registrasi" class="py-20 bg-white relative">
             <div class="max-w-4xl mx-auto px-4 sm:px-6">
                 
@@ -626,6 +658,7 @@
                         <li><a href="#agenda" class="hover:text-olympic-blue transition-colors">Jadwal & Cabang</a></li>
                         <li><a href="#pertandingan" class="hover:text-olympic-blue transition-colors">Jadwal Pertandingan</a></li>
                         <li><a href="#klasemen" class="hover:text-olympic-blue transition-colors">Papan Klasemen</a></li>
+                        <li><a href="#sejarah" class="hover:text-olympic-blue transition-colors">Momen Bersejarah</a></li>
                         <li><a href="#registrasi" class="hover:text-olympic-blue transition-colors">Formulir Pendaftaran</a></li>
                     </ul>
                 </div>
@@ -711,6 +744,8 @@
         }
 
         // ====== Render & Muat Agenda Lomba (cabang, tempat, jadwal) ======
+        let allAgendaItems = [];
+
         function renderAgenda(items) {
             const container = document.getElementById("agenda-list");
             const empty = document.getElementById("agenda-empty");
@@ -764,10 +799,11 @@
         async function loadAgenda() {
             const loading = document.getElementById("agenda-loading");
             try {
-                const items = await fetchAgenda();
-                renderAgenda(items);
+                allAgendaItems = await fetchAgenda();
+                renderAgenda(allAgendaItems);
             } catch (err) {
                 console.error("Gagal memuat agenda lomba:", err);
+                allAgendaItems = [];
                 renderAgenda([]);
             } finally {
                 loading.classList.add("hidden");
@@ -780,7 +816,7 @@
 
         function renderMatchTabs() {
             const container = document.getElementById("match-filter-tabs");
-            const sports = ["", ...Object.keys(sportMeta)];
+            const sports = ["", ...new Set(allMatches.map(m => m.sport))];
             container.innerHTML = sports.map(sport => {
                 const label = sport || "Semua";
                 const isActive = sport === activeMatchFilter;
@@ -809,7 +845,7 @@
             empty.classList.add("hidden");
 
             container.innerHTML = filtered.map(m => {
-                const meta = sportMeta[m.sport] || sportMeta["Padel"];
+                const meta = getSportVisual(m.sport, allAgendaItems);
                 const hasScore = m.score_a !== null && m.score_b !== null && !isNaN(m.score_a) && !isNaN(m.score_b);
                 const aWins = hasScore && m.score_a > m.score_b;
                 const bWins = hasScore && m.score_b > m.score_a;
@@ -851,6 +887,54 @@
             }
             renderMatchTabs();
             renderMatchList();
+        }
+
+        // ====== Video Sejarah / History ======
+        function renderVideos(items) {
+            const container = document.getElementById("sejarah-list");
+            const empty = document.getElementById("sejarah-empty");
+
+            if (!items.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = items.map(v => {
+                const embedUrl = getVideoEmbedUrl(v.video_url);
+                const player = embedUrl
+                    ? `<div class="aspect-video w-full bg-slate-900">
+                           <iframe src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
+                       </div>`
+                    : `<a href="${v.video_url}" target="_blank" rel="noopener noreferrer" class="aspect-video w-full bg-slate-900 flex flex-col items-center justify-center text-white/80 hover:text-white transition-colors gap-2">
+                           <i class="fa-solid fa-circle-play text-4xl"></i>
+                           <span class="text-xs font-bold">Buka Video</span>
+                       </a>`;
+                return `
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-all">
+                    <div class="rounded-t-3xl overflow-hidden">${player}</div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-2 gap-2">
+                            <h3 class="font-title font-extrabold text-base text-slate-900 truncate">${escapeHtml(v.title)}</h3>
+                            ${v.year ? `<span class="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full bg-orange-50 text-olympic-orange border border-orange-200">${escapeHtml(String(v.year))}</span>` : ""}
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(v.description || "")}</p>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        async function loadSejarah() {
+            const loading = document.getElementById("sejarah-loading");
+            try {
+                renderVideos(await fetchVideos());
+            } catch (err) {
+                console.error("Gagal memuat video sejarah:", err);
+                renderVideos([]);
+            } finally {
+                loading.classList.add("hidden");
+            }
         }
 
         // ====== Papan Skor Medali ======
@@ -1082,9 +1166,10 @@
         document.addEventListener("DOMContentLoaded", async () => {
             initMobileMenu();
             loadParticipants();
-            loadAgenda();
             loadEventInfo();
             populateHotelSelect();
+            loadSejarah();
+            await loadAgenda();
             await loadPertandingan();
             loadKlasemen();
         });
