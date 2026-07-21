@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Peserta - KAGUM Olimpiade 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        title: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        olympic: {
+                            blue: '#0066FF',
+                            red: '#FF2A55',
+                            yellow: '#FFB800',
+                            green: '#00C853',
+                            orange: '#FF6B00',
+                            purple: '#8B5CF6',
+                            navy: '#0F172A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .text-gradient-olympic {
+            background: linear-gradient(135deg, #0066FF 0%, #FF2A55 50%, #FFB800 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bg-gradient-hero-light {
+            background:
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 10%, rgba(255, 42, 85, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(255, 184, 0, 0.08) 0%, transparent 40%),
+                #F8FAFC;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-olympic-blue selection:text-white">
+
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all duration-300 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-olympic-blue via-olympic-red to-olympic-yellow flex items-center justify-center shadow-md shadow-olympic-blue/20 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-trophy text-white text-xl"></i>
+                </div>
+                <div>
+                    <span class="font-title font-black text-xl tracking-wider text-slate-900 block">KAGUM</span>
+                    <span class="font-title font-extrabold text-xs tracking-widest text-olympic-blue block -mt-1 uppercase">Olimpiade 2026</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                <a href="index.html#hero" class="hover:text-olympic-blue transition-colors">Beranda</a>
+                <a href="index.html#agenda" class="hover:text-olympic-blue transition-colors">Agenda Lomba</a>
+                <a href="index.html#klasemen" class="hover:text-olympic-blue transition-colors">Klasemen</a>
+                <a href="peserta.html" class="text-olympic-blue">Peserta Terdaftar</a>
+            </nav>
+
+            <!-- CTA Button -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="index.html#registrasi" class="px-6 py-2.5 bg-gradient-to-r from-olympic-blue via-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] active:scale-95 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> Daftar Atlet
+                </a>
+            </div>
+
+            <!-- Mobile menu button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none">
+                <i class="fa-solid fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-4 pb-6 space-y-3 shadow-lg">
+            <a href="index.html#hero" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Beranda</a>
+            <a href="index.html#agenda" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Agenda Lomba</a>
+            <a href="index.html#klasemen" class="block px-4 py-2.5 rounded-xl font-medium text-slate-700 hover:bg-slate-100 transition-colors">Klasemen</a>
+            <a href="peserta.html" class="block px-4 py-2.5 rounded-xl font-medium text-olympic-blue bg-blue-50">Peserta Terdaftar</a>
+            <div class="pt-2">
+                <a href="index.html#registrasi" class="block w-full text-center py-3 bg-gradient-to-r from-olympic-blue to-olympic-red text-white font-bold rounded-xl shadow-md">
+                    Daftar Atlet Sekarang
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <section class="relative overflow-hidden pt-12 pb-10 bg-gradient-hero-light border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <span class="text-xs font-black uppercase tracking-widest text-olympic-blue bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Terdaftar Resmi</span>
+                <h1 class="font-title font-black text-3xl sm:text-4xl text-slate-900 mt-3">
+                    Seluruh <span class="text-gradient-olympic">Peserta Terdaftar</span>
+                </h1>
+                <p class="text-slate-600 mt-2 text-sm sm:text-base max-w-2xl">
+                    Cari dan saring atlet berdasarkan nama, unit hotel, atau cabang olahraga. Data diambil langsung dari catatan pendaftaran resmi.
+                </p>
+            </div>
+        </section>
+
+        <section class="py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Filter Bar -->
+                <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div class="md:col-span-5">
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Cari Atlet</label>
+                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 focus-within:border-olympic-blue focus-within:ring-2 focus-within:ring-olympic-blue/20 transition-all">
+                                <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                                <input type="text" id="search-participant" oninput="applyFilters()" placeholder="Nama atlet..."
+                                    class="bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none w-full font-medium">
+                            </div>
+                        </div>
+                        <div class="md:col-span-4">
+                            <label for="filter-hotel" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Unit Hotel</label>
+                            <select id="filter-hotel" onchange="applyFilters()"
+                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 transition-all cursor-pointer">
+                                <option value="">Semua Hotel</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label for="filter-sport" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Cabang Olahraga</label>
+                            <select id="filter-sport" onchange="applyFilters()"
+                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 transition-all cursor-pointer">
+                                <option value="">Semua Cabang</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+                        <p class="text-xs text-slate-500 font-medium"><span id="result-count" class="font-bold text-slate-800">0</span> peserta ditemukan</p>
+                        <button onclick="resetFilters()" class="text-xs font-bold text-olympic-blue hover:text-blue-700 transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="text-center py-16">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                    <p class="text-slate-500 text-sm font-medium">Memuat data peserta...</p>
+                </div>
+
+                <!-- Dynamic Grid Container -->
+                <div class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="participants-list"></div>
+
+                <!-- Empty / No Results -->
+                <div id="no-results" class="hidden text-center py-16">
+                    <i class="fa-solid fa-ghost text-4xl text-slate-400 mb-3 block"></i>
+                    <p id="no-results-text" class="text-slate-500 text-sm font-medium">Belum ada atlet yang mendaftar.</p>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-xs text-slate-500 font-medium">&copy; 2026 KAGUM Hotels Group. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="shared.js"></script>
+    <script>
+        let allParticipants = [];
+
+        function initMobileMenu() {
+            const btn = document.getElementById("mobile-menu-btn");
+            const menu = document.getElementById("mobile-menu");
+            btn.addEventListener("click", () => menu.classList.toggle("hidden"));
+        }
+
+        async function populateFilterOptions() {
+            const hotelSelect = document.getElementById("filter-hotel");
+            let hotelNames = HOTEL_LIST;
+            try {
+                hotelNames = await fetchHotelNames();
+            } catch (err) {
+                console.error("Gagal memuat daftar hotel:", err);
+            }
+            hotelNames.forEach(hotel => {
+                const opt = document.createElement("option");
+                opt.value = hotel;
+                opt.textContent = hotel;
+                hotelSelect.appendChild(opt);
+            });
+
+            const sportSelect = document.getElementById("filter-sport");
+            Object.keys(sportMeta).forEach(sport => {
+                const opt = document.createElement("option");
+                opt.value = sport;
+                opt.textContent = sport;
+                sportSelect.appendChild(opt);
+            });
+        }
+
+        function renderParticipants(list) {
+            const container = document.getElementById("participants-list");
+            const noResults = document.getElementById("no-results");
+            const noResultsText = document.getElementById("no-results-text");
+            const hasAnyFilter = document.getElementById("search-participant").value.trim() ||
+                document.getElementById("filter-hotel").value ||
+                document.getElementById("filter-sport").value;
+
+            document.getElementById("result-count").textContent = list.length;
+
+            if (!list.length) {
+                container.classList.add("hidden");
+                container.innerHTML = "";
+                noResultsText.textContent = hasAnyFilter
+                    ? "Tidak ada atlet yang cocok dengan filter tersebut."
+                    : "Belum ada atlet yang mendaftar. Jadilah yang pertama!";
+                noResults.classList.remove("hidden");
+                return;
+            }
+            noResults.classList.add("hidden");
+            container.classList.remove("hidden");
+
+            container.innerHTML = list.map(p => {
+                const meta = sportMeta[p.sport] || sportMeta["Padel"];
+                return `
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr ${meta.ring} flex items-center justify-center text-white shrink-0">
+                            <i class="fa-solid ${meta.icon}"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(p.name)}</p>
+                            <p class="text-xs text-slate-500 truncate">${escapeHtml(p.hotel)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${meta.bg} ${meta.text} border ${meta.border}">${escapeHtml(p.sport)}</span>
+                        <span class="text-[11px] text-slate-400 font-medium">${timeAgo(p.timestamp)}</span>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        function applyFilters() {
+            const q = document.getElementById("search-participant").value.trim().toLowerCase();
+            const hotel = document.getElementById("filter-hotel").value;
+            const sport = document.getElementById("filter-sport").value;
+
+            const filtered = allParticipants.filter(p => {
+                const matchesQuery = !q || p.name.toLowerCase().includes(q);
+                const matchesHotel = !hotel || p.hotel === hotel;
+                const matchesSport = !sport || p.sport === sport;
+                return matchesQuery && matchesHotel && matchesSport;
+            });
+
+            renderParticipants(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById("search-participant").value = "";
+            document.getElementById("filter-hotel").value = "";
+            document.getElementById("filter-sport").value = "";
+            renderParticipants(allParticipants);
+        }
+
+        async function init() {
+            initMobileMenu();
+            populateFilterOptions();
+
+            try {
+                allParticipants = await fetchParticipants();
+            } catch (err) {
+                console.error("Gagal memuat data peserta dari Google Sheets:", err);
+                allParticipants = [];
+            }
+
+            document.getElementById("loading-state").classList.add("hidden");
+            renderParticipants(allParticipants);
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>

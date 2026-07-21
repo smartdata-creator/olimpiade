@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Agenda Lomba - KAGUM Olimpiade 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        title: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        olympic: {
+                            blue: '#0066FF', red: '#FF2A55', yellow: '#FFB800',
+                            green: '#00C853', orange: '#FF6B00', purple: '#8B5CF6', navy: '#0F172A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen antialiased">
+
+    <!-- Gerbang Token — ditampilkan sampai token admin tervalidasi ke server -->
+    <div id="login-gate" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 w-full max-w-sm text-center">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-olympic-blue to-olympic-purple flex items-center justify-center text-white text-xl mx-auto mb-5 shadow-md">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h1 class="font-title font-extrabold text-lg text-slate-900 mb-1">Akses Terbatas</h1>
+            <p class="text-xs text-slate-500 mb-6">Halaman setup agenda hanya untuk panitia. Masukkan token admin untuk melanjutkan.</p>
+
+            <form id="gate-form" class="space-y-3 text-left">
+                <input type="password" id="gate-token" required placeholder="Token admin"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                <p id="gate-error" class="hidden text-xs text-red-600 font-semibold"></p>
+                <button type="submit" id="gate-submit-btn" class="w-full py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                    Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Konten Admin — hanya muncul setelah token valid -->
+    <div id="admin-shell" class="hidden flex-col min-h-screen">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-olympic-blue via-olympic-red to-olympic-yellow flex items-center justify-center shadow-sm">
+                    <i class="fa-solid fa-trophy text-white text-sm"></i>
+                </div>
+                <span class="font-title font-black text-sm text-slate-900 tracking-wide">KAGUM OLIMPIADE 2026</span>
+            </a>
+            <a href="index.html" class="text-xs font-bold text-slate-500 hover:text-olympic-blue transition-colors">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Beranda
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow py-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+            <div class="mb-8">
+                <span class="text-xs font-black uppercase tracking-widest text-olympic-purple bg-purple-50 px-3 py-1 rounded-full border border-purple-200">Halaman Internal</span>
+                <h1 class="font-title font-black text-2xl sm:text-3xl text-slate-900 mt-3">Setup Acara</h1>
+                <p class="text-slate-600 text-sm mt-1">Kelola Informasi Pelaksanaan dan Agenda Lomba yang tampil di halaman beranda. Perubahan di sini langsung tersimpan ke Google Sheets.</p>
+            </div>
+
+            <!-- Feedback Banner -->
+            <div id="admin-message" class="hidden mb-6 p-4 rounded-2xl text-sm font-semibold"></div>
+
+            <!-- ====== Informasi Pelaksanaan ====== -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 mb-10">
+                <h2 class="font-title font-extrabold text-lg text-slate-900 mb-1">Informasi Pelaksanaan</h2>
+                <p class="text-xs text-slate-500 mb-6">Tanggal, venue, target peserta &amp; kuota yang tampil di kartu "Informasi Pelaksanaan" pada beranda.</p>
+
+                <form id="settings-form" onsubmit="submitSettings(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tanggal Pelaksanaan</label>
+                            <input type="text" id="s-event-date" placeholder="Contoh: 18 - 21 September 2026"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Target Countdown (Upacara Pembukaan)</label>
+                            <input type="datetime-local" id="s-countdown-target"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Venue Utama</label>
+                            <input type="text" id="s-venue" placeholder="Contoh: Gino Feruci Sport Center & Venue Partner"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Lokasi (badge kecil)</label>
+                            <input type="text" id="s-location-badge" placeholder="Contoh: Bandung, Jawa Barat"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Target Peserta</label>
+                            <input type="text" id="s-target-participants" placeholder="Contoh: 500+ Karyawan Jaringan KAGUM Hotels"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Kuota Atlet Terisi (%)</label>
+                            <input type="number" id="s-quota-percentage" min="0" max="100" placeholder="Contoh: 82"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" id="settings-submit-btn" class="px-6 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Informasi Pelaksanaan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ====== Agenda Lomba ====== -->
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-title font-extrabold text-lg text-slate-900">Agenda Lomba</h2>
+                <button onclick="openForm()" class="px-5 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Tambah Agenda Baru
+                </button>
+            </div>
+
+            <!-- Form Panel (add/edit) -->
+            <div id="agenda-form-panel" class="hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="form-title" class="font-title font-extrabold text-lg text-slate-900">Tambah Agenda Baru</h2>
+                    <button onclick="closeForm()" class="text-slate-400 hover:text-slate-700 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <form id="agenda-form" onsubmit="submitForm(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Cabang Olahraga</label>
+                            <input type="text" id="f-sport" required placeholder="Contoh: Padel Tennis"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Kategori</label>
+                            <input type="text" id="f-category" placeholder="Contoh: Ganda (Bebas)"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tempat / Venue</label>
+                            <input type="text" id="f-venue" placeholder="Contoh: Padel Court Bandung"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Jadwal</label>
+                            <input type="text" id="f-schedule" placeholder="Contoh: 18 September 2026, 08:00"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Ikon (FontAwesome)</label>
+                            <div class="flex items-center gap-3">
+                                <input type="text" id="f-icon" placeholder="fa-table-tennis-paddle-ball" oninput="updateIconPreview()"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                                <div class="w-11 h-11 shrink-0 rounded-xl bg-slate-800 flex items-center justify-center text-white">
+                                    <i id="icon-preview" class="fa-solid fa-trophy"></i>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-400">Cari nama ikon di <span class="font-semibold">fontawesome.com/icons</span>, contoh: fa-soccer-ball, fa-basketball, fa-fish-fins.</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Warna Tema</label>
+                            <div id="color-picker" class="flex items-center gap-2 flex-wrap"></div>
+                            <input type="hidden" id="f-color" value="blue">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Deskripsi Singkat</label>
+                        <textarea id="f-description" rows="2" placeholder="Deskripsi singkat cabang olahraga ini..."
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20"></textarea>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" id="form-submit-btn" class="px-6 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan
+                        </button>
+                        <button type="button" onclick="closeForm()" class="px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading -->
+            <div id="agenda-admin-loading" class="text-center py-14">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Memuat data agenda...</p>
+            </div>
+
+            <!-- Empty -->
+            <div id="agenda-admin-empty" class="hidden text-center py-14 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="fa-solid fa-calendar-plus text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada agenda lomba. Klik "Tambah Agenda Baru" untuk mulai.</p>
+            </div>
+
+            <!-- List -->
+            <div id="agenda-admin-list" class="space-y-3"></div>
+
+            <!-- ====== Jadwal & Hasil Pertandingan ====== -->
+            <div class="flex items-center justify-between mt-12 mb-4">
+                <h2 class="font-title font-extrabold text-lg text-slate-900">Jadwal &amp; Hasil Pertandingan</h2>
+                <button onclick="openMatchForm()" class="px-5 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Tambah Pertandingan
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Atur tim yang bertanding per cabang &amp; input skor hasilnya. Pertandingan bertipe "Final" atau "Perebutan Juara 3" akan otomatis dihitung ke Papan Skor Medali di beranda.</p>
+
+            <!-- Match Form Panel (add/edit) -->
+            <div id="match-form-panel" class="hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 id="match-form-title" class="font-title font-extrabold text-lg text-slate-900">Tambah Pertandingan</h3>
+                    <button onclick="closeMatchForm()" class="text-slate-400 hover:text-slate-700 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <form id="match-form" onsubmit="submitMatchForm(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Cabang Olahraga</label>
+                            <select id="m-sport" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 cursor-pointer">
+                                <option value="" disabled selected>Pilih Cabang</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tahap / Babak</label>
+                            <input type="text" id="m-stage" placeholder="Contoh: Semifinal 1, Final"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tim A (Unit Hotel)</label>
+                            <select id="m-team-a" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 cursor-pointer">
+                                <option value="" disabled selected>Pilih Tim A</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tim B (Unit Hotel)</label>
+                            <select id="m-team-b" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 cursor-pointer">
+                                <option value="" disabled selected>Pilih Tim B</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tempat</label>
+                            <input type="text" id="m-venue" placeholder="Contoh: Gino Sport Center"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Jadwal</label>
+                            <input type="text" id="m-schedule" placeholder="Contoh: 19 September 2026, 15:00"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5 md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Jenis Pertandingan</label>
+                            <select id="m-match-type"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20 cursor-pointer"></select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Skor Tim A</label>
+                            <input type="number" id="m-score-a" placeholder="Kosongkan jika belum main"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Skor Tim B</label>
+                            <input type="number" id="m-score-b" placeholder="Kosongkan jika belum main"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" id="match-submit-btn" class="px-6 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan
+                        </button>
+                        <button type="button" onclick="closeMatchForm()" class="px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Filter Cabang -->
+            <div class="flex items-center gap-2 mb-4">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0">Filter Cabang</label>
+                <select id="match-filter-sport" onchange="renderMatchesAdmin()"
+                    class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium focus:outline-none focus:border-olympic-blue cursor-pointer">
+                    <option value="">Semua Cabang</option>
+                </select>
+            </div>
+
+            <!-- Loading -->
+            <div id="match-admin-loading" class="text-center py-14">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Memuat data pertandingan...</p>
+            </div>
+
+            <!-- Empty -->
+            <div id="match-admin-empty" class="hidden text-center py-14 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="fa-solid fa-people-arrows text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada pertandingan. Klik "Tambah Pertandingan" untuk mulai.</p>
+            </div>
+
+            <!-- List -->
+            <div id="match-admin-list" class="space-y-3"></div>
+
+            <!-- ====== Daftar Peserta ====== -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-12 mb-4">
+                <h2 class="font-title font-extrabold text-lg text-slate-900">
+                    Daftar Peserta <span id="participants-admin-count" class="text-slate-400 font-medium text-sm">(0)</span>
+                </h2>
+                <div class="flex items-center gap-2 bg-white px-3 py-2.5 rounded-xl border border-slate-300 w-full sm:max-w-xs shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+                    <input type="text" id="participants-admin-search" oninput="filterParticipantsAdmin()" placeholder="Cari nama, hotel, atau olahraga..."
+                        class="bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none w-full font-medium">
+                </div>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Hapus data kalau ada atlet yang salah input saat mendaftar. Tindakan ini langsung menghapus baris dari sheet "Pendaftaran".</p>
+
+            <!-- Loading -->
+            <div id="participants-admin-loading" class="text-center py-14">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Memuat daftar peserta...</p>
+            </div>
+
+            <!-- Empty -->
+            <div id="participants-admin-empty" class="hidden text-center py-14 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="fa-solid fa-user-slash text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada peserta yang mendaftar.</p>
+            </div>
+
+            <!-- List -->
+            <div id="participants-admin-list" class="space-y-3"></div>
+
+            <!-- ====== Kelola Hotel ====== -->
+            <div class="flex items-center justify-between mt-12 mb-4">
+                <h2 class="font-title font-extrabold text-lg text-slate-900">
+                    Daftar Unit Hotel <span id="hotel-admin-count" class="text-slate-400 font-medium text-sm">(0)</span>
+                </h2>
+                <button onclick="openHotelForm()" class="px-5 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Tambah Hotel
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Daftar ini muncul di dropdown form pendaftaran, filter peserta, dan pemilihan tim pertandingan. Hapus hotel yang sudah tidak ada, tambah unit baru kapan saja.</p>
+
+            <!-- Peringatan: sheet Hotel masih kosong, masih pakai daftar bawaan -->
+            <div id="hotel-fallback-notice" class="hidden mb-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3 flex-wrap">
+                <p class="text-xs text-amber-800 font-medium">
+                    <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>
+                    Sheet "Hotel" masih kosong — daftar di bawah ini cuma tampilan bawaan (belum tersimpan). Kalau kamu tambah hotel baru sekarang, ke-12 hotel bawaan ini <strong>tidak akan otomatis ikut tersimpan</strong>. Klik tombol ini dulu untuk menyimpannya ke sheet:
+                </p>
+                <button onclick="importDefaultHotels()" id="import-hotels-btn" class="shrink-0 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-colors">
+                    <i class="fa-solid fa-download mr-1.5"></i> Impor 12 Hotel Bawaan
+                </button>
+            </div>
+
+            <!-- Hotel Form Panel (add/edit) -->
+            <div id="hotel-form-panel" class="hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 id="hotel-form-title" class="font-title font-extrabold text-lg text-slate-900">Tambah Hotel</h3>
+                    <button onclick="closeHotelForm()" class="text-slate-400 hover:text-slate-700 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form id="hotel-form" onsubmit="submitHotelForm(event)" class="space-y-5">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Unit Hotel</label>
+                        <input type="text" id="h-name" required placeholder="Contoh: Serela Cihampelas Hotel"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-olympic-blue focus:ring-2 focus:ring-olympic-blue/20">
+                    </div>
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" id="hotel-submit-btn" class="px-6 py-3 bg-gradient-to-r from-olympic-blue to-olympic-purple text-white font-bold rounded-xl shadow-md hover:opacity-95 transition-opacity text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan
+                        </button>
+                        <button type="button" onclick="closeHotelForm()" class="px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading -->
+            <div id="hotel-admin-loading" class="text-center py-14">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-olympic-blue mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Memuat daftar hotel...</p>
+            </div>
+
+            <!-- Empty -->
+            <div id="hotel-admin-empty" class="hidden text-center py-14 bg-white rounded-3xl border border-dashed border-slate-300">
+                <i class="fa-solid fa-hotel text-4xl text-slate-300 mb-3 block"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada hotel. Klik "Tambah Hotel" untuk mulai.</p>
+            </div>
+
+            <!-- List -->
+            <div id="hotel-admin-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+            <p class="text-xs text-slate-400 font-medium">Halaman internal panitia — jangan sebarkan tautan ini secara publik.</p>
+        </div>
+    </footer>
+
+    </div>
+    <!-- /admin-shell -->
+
+    <script src="config.js"></script>
+    <script src="shared.js"></script>
+    <script>
+        let agendaItems = [];
+        let editingId = null;
+
+        // ====== Gerbang Token Admin (proteksi dasar, bukan sistem login penuh) ======
+        function showGate(errorMessage) {
+            document.getElementById("login-gate").classList.remove("hidden");
+            document.getElementById("admin-shell").classList.add("hidden");
+            document.getElementById("admin-shell").classList.remove("flex");
+            const errBox = document.getElementById("gate-error");
+            if (errorMessage) {
+                errBox.textContent = errorMessage;
+                errBox.classList.remove("hidden");
+            } else {
+                errBox.classList.add("hidden");
+            }
+        }
+
+        function unlockAdmin() {
+            document.getElementById("login-gate").classList.add("hidden");
+            document.getElementById("admin-shell").classList.remove("hidden");
+            document.getElementById("admin-shell").classList.add("flex");
+            initAdminContent();
+        }
+
+        async function handleGateSubmit(event) {
+            event.preventDefault();
+            const token = document.getElementById("gate-token").value.trim();
+            const btn = document.getElementById("gate-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            const valid = await verifyAdminToken(token);
+
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+
+            if (valid) {
+                localStorage.setItem("kagum_admin_token", token);
+                unlockAdmin();
+            } else {
+                showGate("Token salah. Coba lagi.");
+            }
+        }
+
+        // Dipakai saat token tersimpan tiba-tiba ditolak server (misalnya token diganti di Code.gs)
+        function rejectStoredToken(errorMessage) {
+            localStorage.removeItem("kagum_admin_token");
+            showGate(errorMessage || "Sesi admin berakhir, silakan masuk ulang.");
+        }
+
+        // ====== Color Picker ======
+        function renderColorPicker() {
+            const picker = document.getElementById("color-picker");
+            picker.innerHTML = Object.entries(COLOR_THEMES).map(([key, theme]) => `
+                <button type="button" data-color="${key}" title="${theme.label}"
+                    class="color-swatch w-9 h-9 rounded-full border-2 border-transparent transition-all"
+                    style="background-color:${theme.swatch}"></button>
+            `).join("");
+            picker.querySelectorAll(".color-swatch").forEach(btn => {
+                btn.addEventListener("click", () => setSelectedColor(btn.dataset.color));
+            });
+        }
+
+        function setSelectedColor(key) {
+            document.getElementById("f-color").value = key;
+            document.querySelectorAll(".color-swatch").forEach(btn => {
+                btn.classList.toggle("border-slate-800", btn.dataset.color === key);
+                btn.classList.toggle("scale-110", btn.dataset.color === key);
+            });
+        }
+
+        function updateIconPreview() {
+            const val = document.getElementById("f-icon").value.trim() || "fa-trophy";
+            document.getElementById("icon-preview").className = `fa-solid ${val}`;
+        }
+
+        // ====== Notifikasi ======
+        function showMessage(message, type = "success") {
+            const box = document.getElementById("admin-message");
+            box.textContent = message;
+            box.className = "mb-6 p-4 rounded-2xl text-sm font-semibold " +
+                (type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200");
+            box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+
+        // ====== Form Add/Edit ======
+        function openForm(item = null) {
+            editingId = item ? item.id : null;
+            document.getElementById("form-title").textContent = item ? "Edit Agenda" : "Tambah Agenda Baru";
+            document.getElementById("f-sport").value = item?.sport || "";
+            document.getElementById("f-category").value = item?.category || "";
+            document.getElementById("f-venue").value = item?.venue || "";
+            document.getElementById("f-schedule").value = item?.schedule || "";
+            document.getElementById("f-icon").value = item?.icon || "";
+            document.getElementById("f-description").value = item?.description || "";
+            setSelectedColor(item?.color || "blue");
+            updateIconPreview();
+            document.getElementById("agenda-form-panel").classList.remove("hidden");
+            document.getElementById("agenda-form-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function closeForm() {
+            document.getElementById("agenda-form-panel").classList.add("hidden");
+            document.getElementById("agenda-form").reset();
+            editingId = null;
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+
+            const payload = {
+                action: editingId ? "agenda_update" : "agenda_create",
+                id: editingId,
+                sport: document.getElementById("f-sport").value.trim(),
+                icon: document.getElementById("f-icon").value.trim() || "fa-trophy",
+                category: document.getElementById("f-category").value.trim(),
+                venue: document.getElementById("f-venue").value.trim(),
+                schedule: document.getElementById("f-schedule").value.trim(),
+                color: document.getElementById("f-color").value,
+                description: document.getElementById("f-description").value.trim()
+            };
+
+            const btn = document.getElementById("form-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+            try {
+                await postAgendaChange(payload);
+                showMessage(editingId ? "Agenda berhasil diperbarui." : "Agenda baru berhasil ditambahkan.", "success");
+                closeForm();
+                await loadAgendaAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menyimpan: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteAgendaItem(id, sportName) {
+            if (!confirm(`Hapus agenda "${sportName}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+            try {
+                await postAgendaChange({ action: "agenda_delete", id });
+                showMessage(`Agenda "${sportName}" berhasil dihapus.`, "success");
+                await loadAgendaAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menghapus: " + err.message, "error");
+                }
+            }
+        }
+
+        // ====== List Rendering ======
+        function renderAdminList() {
+            const container = document.getElementById("agenda-admin-list");
+            const empty = document.getElementById("agenda-admin-empty");
+
+            if (!agendaItems.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = agendaItems.map(item => {
+                const theme = getColorTheme(item.color);
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${theme.ring} flex items-center justify-center text-white shrink-0">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(item.sport)}</p>
+                        <p class="text-xs text-slate-500 truncate">${escapeHtml(item.category || "-")} &middot; ${escapeHtml(item.venue || "-")} &middot; ${escapeHtml(item.schedule || "-")}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button class="btn-edit px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-delete px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-olympic-red text-xs font-bold transition-colors">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join("");
+
+            container.querySelectorAll(".btn-edit").forEach((btn, i) => {
+                btn.addEventListener("click", () => openForm(agendaItems[i]));
+            });
+            container.querySelectorAll(".btn-delete").forEach((btn, i) => {
+                btn.addEventListener("click", () => deleteAgendaItem(agendaItems[i].id, agendaItems[i].sport));
+            });
+        }
+
+        async function loadAgendaAdmin() {
+            try {
+                agendaItems = await fetchAgenda();
+                renderAdminList();
+            } catch (err) {
+                showMessage("Gagal memuat data agenda: " + err.message, "error");
+            } finally {
+                document.getElementById("agenda-admin-loading").classList.add("hidden");
+            }
+        }
+
+        // ====== Informasi Pelaksanaan ======
+        async function loadSettingsAdmin() {
+            try {
+                const settings = await fetchSettings();
+                document.getElementById("s-event-date").value = settings.event_date || "";
+                document.getElementById("s-countdown-target").value = settings.countdown_target || "";
+                document.getElementById("s-venue").value = settings.venue || "";
+                document.getElementById("s-location-badge").value = settings.location_badge || "";
+                document.getElementById("s-target-participants").value = settings.target_participants || "";
+                document.getElementById("s-quota-percentage").value = settings.quota_percentage || "";
+            } catch (err) {
+                showMessage("Gagal memuat informasi pelaksanaan: " + err.message, "error");
+            }
+        }
+
+        async function submitSettings(event) {
+            event.preventDefault();
+            const payload = {
+                event_date: document.getElementById("s-event-date").value.trim(),
+                countdown_target: document.getElementById("s-countdown-target").value,
+                venue: document.getElementById("s-venue").value.trim(),
+                location_badge: document.getElementById("s-location-badge").value.trim(),
+                target_participants: document.getElementById("s-target-participants").value.trim(),
+                quota_percentage: document.getElementById("s-quota-percentage").value
+            };
+
+            const btn = document.getElementById("settings-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+            try {
+                await postSettingsChange(payload);
+                showMessage("Informasi Pelaksanaan berhasil disimpan.", "success");
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menyimpan: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ====== Daftar Peserta ======
+        let participantsAdmin = [];
+
+        function renderParticipantsAdmin(list) {
+            const container = document.getElementById("participants-admin-list");
+            const empty = document.getElementById("participants-admin-empty");
+            document.getElementById("participants-admin-count").textContent = `(${list.length})`;
+
+            if (!list.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = list.map((p, i) => `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-4">
+                    <div class="flex-grow min-w-0">
+                        <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(p.name)}</p>
+                        <p class="text-xs text-slate-500 truncate">${escapeHtml(p.hotel)} &middot; ${escapeHtml(p.sport)} &middot; ${timeAgo(p.timestamp)}</p>
+                    </div>
+                    <button data-idx="${i}" class="btn-delete-participant px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-olympic-red text-xs font-bold transition-colors shrink-0">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>`
+            ).join("");
+
+            container.querySelectorAll(".btn-delete-participant").forEach(btn => {
+                btn.addEventListener("click", () => deleteParticipantItem(list[parseInt(btn.dataset.idx, 10)]));
+            });
+        }
+
+        function filterParticipantsAdmin() {
+            const q = document.getElementById("participants-admin-search").value.trim().toLowerCase();
+            const filtered = !q ? participantsAdmin : participantsAdmin.filter(p =>
+                p.name.toLowerCase().includes(q) ||
+                p.hotel.toLowerCase().includes(q) ||
+                p.sport.toLowerCase().includes(q)
+            );
+            renderParticipantsAdmin(filtered);
+        }
+
+        async function deleteParticipantItem(item) {
+            if (!confirm(`Hapus pendaftaran "${item.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+            try {
+                await deleteParticipant(item);
+                showMessage(`Pendaftaran "${item.name}" berhasil dihapus.`, "success");
+                await loadParticipantsAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menghapus: " + err.message, "error");
+                }
+            }
+        }
+
+        async function loadParticipantsAdmin() {
+            try {
+                participantsAdmin = await fetchParticipants();
+                renderParticipantsAdmin(participantsAdmin);
+            } catch (err) {
+                showMessage("Gagal memuat daftar peserta: " + err.message, "error");
+            } finally {
+                document.getElementById("participants-admin-loading").classList.add("hidden");
+            }
+        }
+
+        // ====== Jadwal & Hasil Pertandingan ======
+        let matchesAdmin = [];
+        let editingMatchId = null;
+
+        async function refreshTeamDropdowns() {
+            let hotelNames = HOTEL_LIST;
+            try {
+                hotelNames = await fetchHotelNames();
+            } catch (err) {
+                console.error("Gagal memuat daftar hotel:", err);
+            }
+            [
+                { select: document.getElementById("m-team-a"), placeholder: "Pilih Tim A" },
+                { select: document.getElementById("m-team-b"), placeholder: "Pilih Tim B" }
+            ].forEach(({ select, placeholder }) => {
+                const currentValue = select.value;
+                select.innerHTML = `<option value="" disabled ${currentValue ? "" : "selected"}>${placeholder}</option>` +
+                    hotelNames.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join("");
+                if (currentValue && hotelNames.includes(currentValue)) select.value = currentValue;
+            });
+        }
+
+        async function populateMatchFormOptions() {
+            const sportSelect = document.getElementById("m-sport");
+            Object.keys(sportMeta).forEach(sport => {
+                const opt = document.createElement("option");
+                opt.value = sport;
+                opt.textContent = sport;
+                sportSelect.appendChild(opt);
+            });
+
+            await refreshTeamDropdowns();
+
+            const typeSelect = document.getElementById("m-match-type");
+            Object.entries(MATCH_TYPES).forEach(([value, label]) => {
+                const opt = document.createElement("option");
+                opt.value = value;
+                opt.textContent = label;
+                typeSelect.appendChild(opt);
+            });
+
+            const filterSelect = document.getElementById("match-filter-sport");
+            Object.keys(sportMeta).forEach(sport => {
+                const opt = document.createElement("option");
+                opt.value = sport;
+                opt.textContent = sport;
+                filterSelect.appendChild(opt);
+            });
+        }
+
+        function openMatchForm(match = null) {
+            editingMatchId = match ? match.id : null;
+            document.getElementById("match-form-title").textContent = match ? "Edit Pertandingan" : "Tambah Pertandingan";
+            document.getElementById("m-sport").value = match?.sport || "";
+            document.getElementById("m-stage").value = match?.stage || "";
+            document.getElementById("m-team-a").value = match?.team_a || "";
+            document.getElementById("m-team-b").value = match?.team_b || "";
+            document.getElementById("m-venue").value = match?.venue || "";
+            document.getElementById("m-schedule").value = match?.schedule || "";
+            document.getElementById("m-match-type").value = match?.match_type || "";
+            document.getElementById("m-score-a").value = match?.score_a ?? "";
+            document.getElementById("m-score-b").value = match?.score_b ?? "";
+            document.getElementById("match-form-panel").classList.remove("hidden");
+            document.getElementById("match-form-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function closeMatchForm() {
+            document.getElementById("match-form-panel").classList.add("hidden");
+            document.getElementById("match-form").reset();
+            editingMatchId = null;
+        }
+
+        async function submitMatchForm(event) {
+            event.preventDefault();
+
+            const scoreARaw = document.getElementById("m-score-a").value;
+            const scoreBRaw = document.getElementById("m-score-b").value;
+
+            const payload = {
+                action: editingMatchId ? "match_update" : "match_create",
+                id: editingMatchId,
+                sport: document.getElementById("m-sport").value,
+                stage: document.getElementById("m-stage").value.trim(),
+                match_type: document.getElementById("m-match-type").value,
+                team_a: document.getElementById("m-team-a").value,
+                team_b: document.getElementById("m-team-b").value,
+                venue: document.getElementById("m-venue").value.trim(),
+                schedule: document.getElementById("m-schedule").value.trim(),
+                score_a: scoreARaw === "" ? "" : Number(scoreARaw),
+                score_b: scoreBRaw === "" ? "" : Number(scoreBRaw)
+            };
+
+            if (payload.team_a === payload.team_b) {
+                showMessage("Tim A dan Tim B tidak boleh sama.", "error");
+                return;
+            }
+
+            const btn = document.getElementById("match-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+            try {
+                await postMatchChange(payload);
+                showMessage(editingMatchId ? "Pertandingan berhasil diperbarui." : "Pertandingan baru berhasil ditambahkan.", "success");
+                closeMatchForm();
+                await loadMatchesAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menyimpan: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteMatchItem(match) {
+            if (!confirm(`Hapus pertandingan "${match.team_a} vs ${match.team_b}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+            try {
+                await postMatchChange({ action: "match_delete", id: match.id });
+                showMessage("Pertandingan berhasil dihapus.", "success");
+                await loadMatchesAdmin();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menghapus: " + err.message, "error");
+                }
+            }
+        }
+
+        function renderMatchesAdmin() {
+            const sportFilter = document.getElementById("match-filter-sport").value;
+            const list = sportFilter ? matchesAdmin.filter(m => m.sport === sportFilter) : matchesAdmin;
+
+            const container = document.getElementById("match-admin-list");
+            const empty = document.getElementById("match-admin-empty");
+
+            if (!list.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = list.map(m => {
+                const meta = sportMeta[m.sport] || sportMeta["Padel"];
+                const hasScore = m.score_a !== null && m.score_b !== null && !isNaN(m.score_a) && !isNaN(m.score_b);
+                const scoreText = hasScore ? `${m.score_a} - ${m.score_b}` : "Belum ada skor";
+                const typeLabel = MATCH_TYPES[m.match_type] || MATCH_TYPES[""];
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr ${meta.ring} flex items-center justify-center text-white shrink-0">
+                        <i class="fa-solid ${meta.icon}"></i>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <p class="font-bold text-slate-900 text-sm truncate">${escapeHtml(m.team_a)} <span class="text-slate-400 font-normal">vs</span> ${escapeHtml(m.team_b)}</p>
+                        <p class="text-xs text-slate-500 truncate">${escapeHtml(m.sport)}${m.stage ? " &middot; " + escapeHtml(m.stage) : ""} &middot; ${escapeHtml(typeLabel)}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <p class="font-black text-sm text-slate-800">${scoreText}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button class="btn-edit-match px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-delete-match px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-olympic-red text-xs font-bold transition-colors">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join("");
+
+            container.querySelectorAll(".btn-edit-match").forEach((btn, i) => {
+                btn.addEventListener("click", () => openMatchForm(list[i]));
+            });
+            container.querySelectorAll(".btn-delete-match").forEach((btn, i) => {
+                btn.addEventListener("click", () => deleteMatchItem(list[i]));
+            });
+        }
+
+        async function loadMatchesAdmin() {
+            try {
+                matchesAdmin = await fetchMatches();
+                renderMatchesAdmin();
+            } catch (err) {
+                showMessage("Gagal memuat data pertandingan: " + err.message, "error");
+            } finally {
+                document.getElementById("match-admin-loading").classList.add("hidden");
+            }
+        }
+
+        // ====== Kelola Hotel ======
+        let hotelsAdmin = [];
+        let editingHotelId = null;
+
+        function openHotelForm(hotel = null) {
+            editingHotelId = hotel ? hotel.id : null;
+            document.getElementById("hotel-form-title").textContent = hotel ? "Edit Hotel" : "Tambah Hotel";
+            document.getElementById("h-name").value = hotel?.name || "";
+            document.getElementById("hotel-form-panel").classList.remove("hidden");
+            document.getElementById("hotel-form-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function closeHotelForm() {
+            document.getElementById("hotel-form-panel").classList.add("hidden");
+            document.getElementById("hotel-form").reset();
+            editingHotelId = null;
+        }
+
+        async function submitHotelForm(event) {
+            event.preventDefault();
+            const payload = {
+                action: editingHotelId ? "hotel_update" : "hotel_create",
+                id: editingHotelId,
+                name: document.getElementById("h-name").value.trim()
+            };
+
+            const btn = document.getElementById("hotel-submit-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+            try {
+                await postHotelChange(payload);
+                showMessage(editingHotelId ? "Hotel berhasil diperbarui." : "Hotel baru berhasil ditambahkan.", "success");
+                closeHotelForm();
+                await loadHotelsAdmin();
+                await refreshTeamDropdowns();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menyimpan: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteHotelItem(hotel) {
+            if (!confirm(`Hapus "${hotel.name}" dari daftar hotel? Tindakan ini tidak bisa dibatalkan.`)) return;
+            try {
+                await postHotelChange({ action: "hotel_delete", id: hotel.id });
+                showMessage(`Hotel "${hotel.name}" berhasil dihapus.`, "success");
+                await loadHotelsAdmin();
+                await refreshTeamDropdowns();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal menghapus: " + err.message, "error");
+                }
+            }
+        }
+
+        function isFallbackHotel(hotel) {
+            return String(hotel.id).indexOf("default-") === 0;
+        }
+
+        function renderHotelsAdmin() {
+            const container = document.getElementById("hotel-admin-list");
+            const empty = document.getElementById("hotel-admin-empty");
+            const notice = document.getElementById("hotel-fallback-notice");
+            document.getElementById("hotel-admin-count").textContent = `(${hotelsAdmin.length})`;
+
+            const isFallback = hotelsAdmin.length > 0 && hotelsAdmin.every(isFallbackHotel);
+            notice.classList.toggle("hidden", !isFallback);
+
+            if (!hotelsAdmin.length) {
+                container.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            container.innerHTML = hotelsAdmin.map((h, i) => `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-50 text-olympic-blue flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-hotel text-sm"></i>
+                    </div>
+                    <p class="flex-grow min-w-0 font-bold text-slate-900 text-sm truncate">${escapeHtml(h.name)}</p>
+                    ${isFallbackHotel(h) ? `<span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full shrink-0">Bawaan</span>` : `
+                    <button data-idx="${i}" class="btn-edit-hotel px-2.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs transition-colors shrink-0">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button data-idx="${i}" class="btn-delete-hotel px-2.5 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-olympic-red text-xs transition-colors shrink-0">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>`}
+                </div>`
+            ).join("");
+
+            container.querySelectorAll(".btn-edit-hotel").forEach(btn => {
+                btn.addEventListener("click", () => openHotelForm(hotelsAdmin[parseInt(btn.dataset.idx, 10)]));
+            });
+            container.querySelectorAll(".btn-delete-hotel").forEach(btn => {
+                btn.addEventListener("click", () => deleteHotelItem(hotelsAdmin[parseInt(btn.dataset.idx, 10)]));
+            });
+        }
+
+        async function loadHotelsAdmin() {
+            try {
+                hotelsAdmin = await fetchHotelRecords();
+                renderHotelsAdmin();
+            } catch (err) {
+                showMessage("Gagal memuat daftar hotel: " + err.message, "error");
+            } finally {
+                document.getElementById("hotel-admin-loading").classList.add("hidden");
+            }
+        }
+
+        async function importDefaultHotels() {
+            const btn = document.getElementById("import-hotels-btn");
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Mengimpor...';
+
+            try {
+                for (const name of HOTEL_LIST) {
+                    await postHotelChange({ action: "hotel_create", name });
+                }
+                showMessage(`${HOTEL_LIST.length} hotel bawaan berhasil disimpan ke sheet.`, "success");
+                await loadHotelsAdmin();
+                await refreshTeamDropdowns();
+            } catch (err) {
+                if (/token/i.test(err.message)) {
+                    rejectStoredToken(err.message);
+                } else {
+                    showMessage("Gagal mengimpor: " + err.message, "error");
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        function initAdminContent() {
+            renderColorPicker();
+            setSelectedColor("blue");
+            populateMatchFormOptions();
+            loadSettingsAdmin();
+            loadAgendaAdmin();
+            loadMatchesAdmin();
+            loadParticipantsAdmin();
+            loadHotelsAdmin();
+        }
+
+        // ====== Bootstrap: cek token tersimpan, kalau tidak ada/ tidak valid, tampilkan gerbang ======
+        async function bootstrap() {
+            document.getElementById("gate-form").addEventListener("submit", handleGateSubmit);
+
+            const storedToken = localStorage.getItem("kagum_admin_token") || "";
+            if (!storedToken) {
+                showGate();
+                return;
+            }
+
+            const valid = await verifyAdminToken(storedToken);
+            if (valid) {
+                unlockAdmin();
+            } else {
+                localStorage.removeItem("kagum_admin_token");
+                showGate("Sesi admin berakhir, silakan masuk ulang.");
+            }
+        }
+
+        bootstrap();
+    </script>
+</body>
+</html>
