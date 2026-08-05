@@ -23,13 +23,13 @@
                     },
                     colors: {
                         olympic: {
-                            blue: '#0066FF',
-                            red: '#FF2A55',
-                            yellow: '#FFB800',
-                            green: '#00C853',
-                            orange: '#FF6B00',
-                            purple: '#8B5CF6',
-                            navy: '#0F172A',
+                            blue: '#46599E',
+                            red: '#D9614F',
+                            yellow: '#F0A868',
+                            green: '#2FA87A',
+                            orange: '#D9895F',
+                            purple: '#6C64A6',
+                            navy: '#1E2A57',
                         }
                     }
                 }
@@ -43,20 +43,20 @@
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
         .text-gradient-olympic {
-            background: linear-gradient(135deg, #0066FF 0%, #FF2A55 50%, #FFB800 100%);
+            background: linear-gradient(135deg, #46599E 0%, #D9614F 55%, #F0A868 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .bg-gradient-hero-light {
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 10%, rgba(255, 42, 85, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 50% 80%, rgba(255, 184, 0, 0.08) 0%, transparent 40%),
-                #F8FAFC;
+        .bg-gradient-hero-navy {
+            background:
+                radial-gradient(circle at 10% 15%, rgba(217, 97, 79, 0.35) 0%, transparent 42%),
+                radial-gradient(circle at 90% 8%, rgba(70, 89, 158, 0.45) 0%, transparent 45%),
+                radial-gradient(circle at 50% 95%, rgba(240, 168, 104, 0.16) 0%, transparent 45%),
+                linear-gradient(160deg, #232F5C 0%, #16204A 60%, #121A3E 100%);
         }
         .olympic-ring-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 102, 255, 0.12), 0 8px 10px -6px rgba(255, 42, 85, 0.12);
+            box-shadow: 0 10px 25px -5px rgba(70, 89, 158, 0.2), 0 8px 10px -6px rgba(217, 97, 79, 0.2);
         }
         @keyframes marquee-scroll {
             from { transform: translateX(0); }
@@ -132,32 +132,36 @@
     </header>
 
     <main class="flex-grow">
-        <section id="hero" class="relative overflow-hidden pt-10 pb-20 md:py-24 bg-gradient-hero-light">
+        <section id="banner" class="w-full">
+            <img src="assets/kagum-olimpiade-banner.jpg" alt="KAGUM Olimpiade 2026 - Together Beyond Limits" class="w-full h-auto block" loading="eager">
+        </section>
+
+        <section id="hero" class="relative overflow-hidden pt-10 pb-20 md:py-24 bg-gradient-hero-navy">
             <!-- Decorative Olympic Spirit Rings BG Floating Elements -->
-            <div class="absolute top-12 left-10 w-64 h-64 rounded-full bg-olympic-blue/10 blur-3xl pointer-events-none"></div>
-            <div class="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-olympic-yellow/15 blur-3xl pointer-events-none"></div>
+            <div class="absolute top-12 left-10 w-64 h-64 rounded-full bg-olympic-red/25 blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-olympic-yellow/20 blur-3xl pointer-events-none"></div>
 
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                    
+
                     <!-- Hero Content -->
                     <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 text-olympic-blue text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm mx-auto lg:mx-0">
-                            <span class="w-2.5 h-2.5 rounded-full bg-olympic-red animate-ping"></span> 
+                            <span class="w-2.5 h-2.5 rounded-full bg-olympic-red animate-ping"></span>
                             <span class="text-slate-700">Pesta Olahraga Terbesar</span> KAGUM Group 2026
                         </div>
-                        
-                        <h1 class="font-title font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight text-slate-900 leading-tight">
+
+                        <h1 class="font-title font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-tight">
                             Kobarkan Semangat, <br class="hidden sm:inline">
                             Raih <span class="text-gradient-olympic">Juara Sejati!</span>
                         </h1>
-                        
-                        <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                            Ajang kompetisi antar unit hotel KAGUM Group! Pertunjukkan bakat, kecepatan, dan ketangkasan dalam 4 cabang olahraga utama: <span class="font-bold text-olympic-blue">Padel</span>, <span class="font-bold text-olympic-red">Futsal</span>, <span class="font-bold text-olympic-green">Mancing Mania</span>, dan <span class="font-bold text-olympic-purple">Basket 3v3</span>.
+
+                        <p class="text-slate-300 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                            Ajang kompetisi antar unit hotel KAGUM Group! Pertunjukkan bakat, kecepatan, dan ketangkasan dalam 4 cabang olahraga utama: <span class="font-bold text-blue-300">Padel</span>, <span class="font-bold text-rose-300">Futsal</span>, <span class="font-bold text-emerald-300">Mancing Mania</span>, dan <span class="font-bold text-violet-300">Basket 3v3</span>.
                         </p>
 
                         <div class="py-3">
-                            <p class="text-xs font-extrabold text-slate-500 tracking-wider uppercase mb-3">Menuju Upacara Pembukaan:</p>
+                            <p class="text-xs font-extrabold text-slate-300 tracking-wider uppercase mb-3">Menuju Upacara Pembukaan:</p>
                             <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-sm sm:max-w-md mx-auto lg:mx-0">
                                 <div class="bg-white border border-slate-200/90 rounded-2xl p-3 text-center shadow-md shadow-slate-200/50">
                                     <span id="days" class="block text-2xl sm:text-3xl font-black font-title text-olympic-blue">00</span>
@@ -548,6 +552,7 @@
                                         <option value="Food & Beverage Service">Food & Beverage Service</option>
                                         <option value="Food & Beverage Product (Kitchen)">Food & Beverage Product (Kitchen)</option>
                                         <option value="Sales & Marketing">Sales & Marketing</option>
+                                        <option value="Digital Marketing">Digital Marketing</option>
                                         <option value="Human Resources & Security">Human Resources & Security</option>
                                         <option value="Finance, Accounting & Purchasing">Finance, Accounting & Purchasing</option>
                                         <option value="Engineering & IT">Engineering & IT</option>
