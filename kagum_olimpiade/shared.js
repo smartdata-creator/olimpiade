@@ -109,8 +109,15 @@ const DEFAULT_SETTINGS = {
     venue: "Gino Feruci Sport Center & Venue Partner",
     location_badge: "Bandung, Jawa Barat",
     target_participants: "500+ Karyawan Jaringan KAGUM Hotels",
-    quota_percentage: "82"
+    quota_percentage: "82",
+    registration_open: "true"
 };
+
+// Cek apakah pendaftaran masih dibuka berdasarkan settings.registration_open
+// (disimpan sebagai teks "true"/"false" di sheet "Pengaturan")
+function isRegistrationOpen(settings) {
+    return String(settings?.registration_open ?? "true").trim().toLowerCase() !== "false";
+}
 
 // Ubah timestamp ISO menjadi teks relatif berbahasa Indonesia
 function timeAgo(isoString) {
@@ -375,6 +382,28 @@ function getVideoEmbedUrl(url) {
     // YouTube: https://www.youtube.com/watch?v=VIDEO_ID
     m = trimmed.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
     if (m) return `https://www.youtube.com/embed/${m[1]}`;
+
+    return null;
+}
+
+// Ambil URL gambar thumbnail dari link video YouTube/Google Drive, supaya kartu video
+// bisa menampilkan pratinjau gambar dulu (bukan kotak hitam kosong) sebelum videonya diputar.
+// Return null kalau tidak dikenali (pemanggil bisa tetap tampilkan kotak hitam + ikon play).
+function getVideoThumbnailUrl(url) {
+    if (!url) return null;
+    const trimmed = String(url).trim();
+
+    let m = trimmed.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1000`;
+
+    m = trimmed.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+    if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1000`;
+
+    m = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+    if (m) return `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`;
+
+    m = trimmed.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+    if (m) return `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`;
 
     return null;
 }
