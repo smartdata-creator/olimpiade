@@ -481,6 +481,15 @@
                     <!-- Notification Box -->
                     <div id="form-message" class="hidden mb-6 p-4 rounded-2xl text-sm font-semibold transition-all"></div>
 
+                    <!-- Ditampilkan saat pendaftaran ditutup dari halaman admin -->
+                    <div id="registration-closed-message" class="hidden text-center py-10">
+                        <div class="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center text-slate-500 text-xl mx-auto mb-4">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3 class="font-title font-extrabold text-lg text-slate-900 mb-1">Pendaftaran Telah Ditutup</h3>
+                        <p class="text-sm text-slate-600 max-w-md mx-auto">Formulir pendaftaran atlet untuk KAGUM Olimpiade 2026 sudah tidak menerima pengisian baru. Hubungi panitia jika Anda memerlukan bantuan lebih lanjut.</p>
+                    </div>
+
                     <form id="olympic-register-form" onsubmit="handleRegistrationSubmit(event)" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             
@@ -688,7 +697,7 @@
 
             <div class="border-t border-slate-200 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-xs text-slate-500 font-medium">
-                    &copy; 2026 KAGUM Hotels Group. All rights reserved. Bright Olympic Theme. Sponsored by PT Accuransi Teknologi Indonesia
+                    &copy; 2026 KAGUM Hotels Group. All rights reserved.
                 </p>
                 <div class="flex gap-4 text-slate-400 text-base">
                     <a href="#" class="hover:text-olympic-blue transition-colors"><i class="fa-brands fa-instagram"></i></a>
@@ -989,9 +998,15 @@
 
             container.innerHTML = items.map(v => {
                 const embedUrl = getVideoEmbedUrl(v.video_url);
+                const thumbUrl = getVideoThumbnailUrl(v.video_url);
                 const player = embedUrl
-                    ? `<div class="aspect-video w-full bg-slate-900">
-                           <iframe src="${embedUrl}" class="w-full h-full" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
+                    ? `<div class="relative aspect-video w-full bg-slate-900 cursor-pointer group/play js-play-video" data-embed="${escapeHtml(embedUrl)}">
+                           ${thumbUrl ? `<img src="${escapeHtml(thumbUrl)}" alt="" class="absolute inset-0 w-full h-full object-cover" loading="lazy" onerror="this.remove()">` : ""}
+                           <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover/play:bg-black/40 transition-colors">
+                               <div class="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center text-olympic-blue text-lg shadow-lg group-hover/play:scale-105 transition-transform">
+                                   <i class="fa-solid fa-play ml-0.5"></i>
+                               </div>
+                           </div>
                        </div>`
                     : `<a href="${v.video_url}" target="_blank" rel="noopener noreferrer" class="aspect-video w-full bg-slate-900 flex flex-col items-center justify-center text-white/80 hover:text-white transition-colors gap-2">
                            <i class="fa-solid fa-circle-play text-4xl"></i>
@@ -1010,6 +1025,20 @@
                 </div>`;
             }).join("");
         }
+
+        // Ganti thumbnail dengan iframe video hanya saat diklik, supaya video tidak
+        // langsung dimuat semua sekaligus untuk tiap kartu.
+        // Ditambah "autoplay=1" supaya video langsung main dari 1 klik, tidak perlu
+        // klik lagi tombol play bawaan Google Drive/YouTube di dalam iframe.
+        document.getElementById("sejarah-list").addEventListener("click", (event) => {
+            const card = event.target.closest(".js-play-video");
+            if (!card) return;
+            const embedUrl = card.dataset.embed;
+            const autoplayUrl = embedUrl + (embedUrl.includes("?") ? "&" : "?") + "autoplay=1";
+            card.outerHTML = `<div class="aspect-video w-full bg-slate-900">
+                    <iframe src="${autoplayUrl}" class="w-full h-full" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+                </div>`;
+        });
 
         async function loadSejarah() {
             const loading = document.getElementById("sejarah-loading");
@@ -1246,6 +1275,10 @@
             document.getElementById("info-quota-bar").style.width = `${quota}%`;
 
             initCountdown(settings.countdown_target);
+
+            const registrationOpen = isRegistrationOpen(settings);
+            document.getElementById("olympic-register-form").classList.toggle("hidden", !registrationOpen);
+            document.getElementById("registration-closed-message").classList.toggle("hidden", registrationOpen);
         }
 
         // ====== Inisialisasi ======
